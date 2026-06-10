@@ -1,0 +1,466 @@
+/* ============================================================
+   ARMORY HALL — visual skeleton
+   Phase states driven by .stage[data-phase="1|2|3"]
+   ============================================================ */
+:root{
+  --bg:#080a0d;
+  --bg-2:#050608;
+  --panel-bg:#0c0f13;
+  --spot:#f6efe1;
+  --amber:#f4a93a;
+  --amber-soft:#ffc56b;
+  --warm:#ffd9a0;
+  --text:#ece4d6;
+  --muted:#8a8276;
+  --muted-2:#5c564d;
+  --line:rgba(244,169,58,.20);
+  --line-soft:rgba(236,228,214,.10);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --fr-display:"Syne",sans-serif;
+  --fr-body:"Hanken Grotesk",sans-serif;
+  --fr-mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+html{overflow-x:clip}
+body{
+  background:var(--bg-2);
+  color:var(--text);
+  font-family:var(--fr-body);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+body.is-loading{overflow:hidden;height:100vh}
+@media (hover:hover) and (pointer:fine){
+  body.has-reticle{cursor:none}
+  body.has-reticle a,body.has-reticle button{cursor:none}
+}
+img{display:block;max-width:100%}
+::selection{background:rgba(244,169,58,.3);color:#fff}
+
+/* ============================================================
+   SCROLL TRACK + PINNED STAGE
+   ============================================================ */
+/* GSAP ScrollTrigger pins .stage; height auto lets the pin spacer create the scroll room.
+   (Manual no-GSAP fallback re-adds sticky + an explicit track height from armory.js.) */
+.scroll-track{height:auto;position:relative}
+.stage{
+  position:relative;top:0;left:0;
+  width:100%;height:100vh;height:100svh;
+  overflow:hidden;background:var(--bg-2);
+}
+.layer{position:absolute;inset:0;pointer-events:none}
+
+/* ---- PAGE-1 scrub canvas (newgif) + PAGE-2 idle loop ---- */
+#revealCanvas{z-index:1;width:100%;height:100%;display:block}
+#idle{z-index:2;width:100%;height:100%;object-fit:cover;display:block;background:#05070a;
+  opacity:0;transition:opacity .9s var(--ease)}          /* Page-2 bg over the held last frame */
+/* only reveal the idle loop once it actually decodes — else the lit empty-hall last
+   frame on the canvas stays visible (no blank-dark video cover, e.g. on Safari/headless) */
+body.idle-ok .stage.is-arsenal #idle{opacity:1}
+/* once the reveal source is live, drop the gradient stand-ins */
+body.frames-ready .layer-bg-dark,
+body.frames-ready .layer-bg-bright{opacity:0 !important}
+
+/* ---- backgrounds ---- */
+.layer-bg-dark,.layer-bg-bright{
+  background-size:cover;background-position:center;
+  transition:opacity 1s var(--ease),transform 1.6s var(--ease),filter 1s var(--ease);
+  transform:scale(1.06);
+}
+.layer-bg-dark{
+  z-index:1;opacity:1;
+  background:
+    radial-gradient(60% 42% at 50% 60%, rgba(244,169,58,.05), transparent 70%),
+    radial-gradient(120% 90% at 50% 8%, #11151b 0%, #080a0d 46%, #04050700 100%),
+    linear-gradient(180deg,#070a0e,#04050700);
+  background-color:#05070a;
+}
+/* faint alcove silhouettes baked into the dark bg */
+.layer-bg-dark::before{
+  content:"";position:absolute;inset:0;opacity:.5;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 7.5%,
+      rgba(0,0,0,.55) 7.5% 9%,
+      rgba(20,24,30,.6) 9% 11%,
+      rgba(0,0,0,.55) 11% 12.5%,
+      transparent 12.5% 20%);
+  -webkit-mask:linear-gradient(180deg,transparent,#000 26%,#000 78%,transparent);
+  mask:linear-gradient(180deg,transparent,#000 26%,#000 78%,transparent);
+}
+/* floor */
+.layer-bg-dark::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.6));
+  box-shadow:inset 0 1px 0 rgba(244,169,58,.06);
+}
+.layer-bg-bright{
+  z-index:2;opacity:0;
+  background:
+    radial-gradient(50% 40% at 50% 56%, rgba(255,201,107,.16), transparent 72%),
+    radial-gradient(120% 90% at 50% 4%, #1a1c1f 0%, #0c0e12 50%, #06070900 100%),
+    linear-gradient(180deg,#0e1115,#05060800);
+  background-color:#0a0c10;
+}
+.stage[data-phase="2"] .layer-bg-dark{opacity:.55;transform:scale(1.12)}
+.stage[data-phase="2"] .layer-bg-bright{opacity:.7;transform:scale(1.1)}
+.stage[data-phase="3"] .layer-bg-dark{opacity:0}
+.stage[data-phase="3"] .layer-bg-bright{opacity:1;transform:scale(1.12)}
+
+/* volumetric center beam */
+.layer-beam{
+  z-index:3;opacity:.0;transition:opacity 1s var(--ease);
+  background:
+    radial-gradient(40% 60% at 50% 40%, rgba(255,217,160,.10), transparent 70%),
+    conic-gradient(from 180deg at 50% -6%, transparent 46%, rgba(255,217,160,.10) 50%, transparent 54%);
+  -webkit-mask:linear-gradient(180deg,#000,transparent 86%);
+  mask:linear-gradient(180deg,#000,transparent 86%);
+}
+.stage[data-phase="2"] .layer-beam{opacity:.6}
+.stage[data-phase="3"] .layer-beam{opacity:1}
+
+/* ============================================================
+   PHASE 1 — particle figure + hint
+   ============================================================ */
+/* particle figure retired — the scrub video carries the Page-1 visuals now */
+#userParticle{display:none}
+#userParticle.legacy{
+  position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  width:min(24vh,210px);height:min(41vh,360px);z-index:6;
+  transition:opacity .6s var(--ease),transform 1s var(--ease),filter .8s var(--ease);
+}
+/* stays glowing through the awakening (phase 2); only leaves when JS dissolves it ~60-65% */
+.stage[data-phase="2"] #userParticle{opacity:1}
+.stage[data-phase="3"] #userParticle{opacity:0;pointer-events:none}
+#userParticle.gone{opacity:0;transform:translate(-50%,-60%) scale(1.18);filter:blur(10px);pointer-events:none}
+.pf-glow{
+  position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);
+  width:150%;height:74%;border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(255,201,107,.45), rgba(244,169,58,.10) 46%, transparent 72%);
+  filter:blur(10px);animation:breathe 4.8s var(--ease) infinite;
+}
+/* the literal gold mech silhouette is removed — Phase 1 keeps only a soft glowing
+   "presence" + rising sparks as a placeholder for the real Nehemiah particle-face. */
+.pf-figure{display:none}
+.pf-particles{position:absolute;inset:0;overflow:visible}
+.pf-spark{position:absolute;bottom:30%;width:2px;height:2px;border-radius:50%;
+  background:var(--warm);box-shadow:0 0 6px var(--amber-soft);opacity:0;
+  animation:rise 5.5s linear infinite}
+@keyframes breathe{0%,100%{opacity:.85;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.035)}}
+@keyframes rise{0%{opacity:0;transform:translateY(10px)}12%{opacity:.9}100%{opacity:0;transform:translateY(-130px)}}
+/* dissolve burst sparks (injected by armory.js at ~60-65% scroll) */
+@keyframes burst{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.3)}}
+
+.user-hint{
+  position:absolute;left:50%;bottom:7.5%;transform:translateX(-50%);
+  z-index:9;text-align:center;transition:opacity .5s var(--ease);
+}
+.stage.is-arsenal .user-hint{opacity:0}
+.uh-label{font-family:var(--fr-mono);font-size:12px;letter-spacing:.42em;
+  color:var(--warm);text-transform:uppercase;padding-left:.42em}
+.uh-sub{font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.3em;color:var(--muted);margin-top:9px}
+.uh-arrow{width:1px;height:40px;margin:18px auto 0;position:relative;overflow:hidden;
+  background:linear-gradient(var(--amber),transparent)}
+.uh-arrow::after{content:"";position:absolute;top:0;left:50%;margin-left:-3px;width:5px;height:5px;
+  border-right:1px solid var(--amber);border-bottom:1px solid var(--amber);
+  transform:rotate(45deg);animation:arr 1.9s var(--ease) infinite}
+@keyframes arr{0%{top:-6px;opacity:0}40%{opacity:1}100%{top:34px;opacity:0}}
+
+/* ============================================================
+   ARSENAL — robots on an arc
+   ============================================================ */
+/* arsenal stays fully hidden through the scrub; only the cinematic beat reveals it */
+.arsenal{position:absolute;inset:0;z-index:5;opacity:0;pointer-events:none;transition:opacity .6s var(--ease)}
+.stage.is-arsenal .arsenal{opacity:1;pointer-events:auto}
+.arsenal-floor{position:absolute;left:0;right:0;bottom:0;height:30%;z-index:1;
+  background:radial-gradient(70% 120% at 50% 0%, rgba(255,201,107,.06), transparent 60%)}
+
+.robot{
+  position:absolute;left:var(--x);bottom:var(--y);
+  width:var(--w);transform:translateX(-50%);
+  opacity:0;                                      /* staggered fade-in on arsenal reveal */
+  transition:opacity .55s var(--ease),filter .45s var(--ease),transform .45s var(--ease);
+  z-index:var(--z,5);cursor:pointer;
+  --glow:var(--amber);
+}
+.robot.on{opacity:1}
+.robot-figure{position:relative;width:100%;aspect-ratio:140/240;
+  filter:drop-shadow(0 18px 26px rgba(0,0,0,.6))}
+.robot-body{position:absolute;inset:0;
+  -webkit-mask:var(--mech) center/contain no-repeat;
+  mask:var(--mech) center/contain no-repeat;
+  background:
+    linear-gradient(180deg,#23262b 0%,#15171b 40%,#0c0d10 100%);
+  box-shadow:inset 0 0 22px rgba(0,0,0,.7);}
+/* warm rim from the spotlight */
+.robot-body::after{content:"";position:absolute;inset:0;
+  -webkit-mask:var(--mech) center/contain no-repeat;mask:var(--mech) center/contain no-repeat;
+  background:linear-gradient(115deg,transparent 42%,rgba(255,201,107,.28) 60%,transparent 70%);
+  mix-blend-mode:screen;opacity:.7}
+/* glowing eyes + chest core */
+.robot-core{position:absolute;left:50%;top:31%;transform:translateX(-50%);
+  width:13%;height:4.5%;border-radius:50%;background:var(--glow);
+  box-shadow:0 0 14px 3px var(--glow);opacity:.9;
+  animation:pulse 3.4s var(--ease) infinite}
+.robot-eyes{position:absolute;left:50%;top:14.5%;transform:translateX(-50%);
+  width:17%;height:2.4%;display:flex;justify-content:space-between}
+.robot-eyes i{display:block;width:32%;height:100%;border-radius:2px;background:var(--warm);
+  box-shadow:0 0 10px 2px var(--glow)}
+@keyframes pulse{0%,100%{opacity:.75}50%{opacity:1}}
+/* contact shadow */
+.robot-shadow{position:absolute;left:50%;bottom:-3%;transform:translateX(-50%);
+  width:78%;height:6%;border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.7), transparent 70%);
+  filter:blur(3px);z-index:-1}
+
+/* spotlight pool */
+.robot::before{content:"";position:absolute;left:50%;bottom:-4%;transform:translateX(-50%);
+  width:120%;height:24%;border-radius:50%;z-index:-2;
+  background:radial-gradient(ellipse at center, rgba(255,201,107,.16), transparent 68%);
+  opacity:.5;transition:opacity .45s var(--ease)}
+
+/* ---- real PNG robot (placeholder = generated/robot2_clear.png, transparent cut) ----
+   Already alpha-cut, so no mask needed — just drop the silhouette mask, sit it on the
+   floor, and add a grounding shadow + warm glow. The neon seams carry the "light source". */
+.robot.has-img .robot-figure{aspect-ratio:108/192;filter:none}   /* portrait box ≈ robot PNG */
+.robot.has-img .robot-body{
+  -webkit-mask:none;mask:none;
+  background-size:contain !important;background-repeat:no-repeat !important;background-position:bottom center !important;
+  box-shadow:none;
+  /* NO offset drop-shadow — that made them look airborne. Just a soft warm bloom. */
+  filter:drop-shadow(0 0 20px rgba(255,180,84,.14));
+  transition:filter .45s var(--ease);
+}
+.robot.has-img .robot-body::after{display:none}
+.robot.has-img .robot-eyes,
+.robot.has-img .robot-core{display:none}        /* PNG carries its own core/eye glow */
+.robot.has-img .robot-shadow{display:none}      /* no detached feet shadow */
+.robot.has-img:hover .robot-body{
+  filter:drop-shadow(0 0 38px var(--glow)) brightness(1.12);
+}
+.robot.has-img.is-locked .robot-body{filter:grayscale(.7) brightness(.42)}
+
+/* hover: spotlight this unit, dim the rest */
+.arsenal:hover .robot{filter:saturate(.55) brightness(.7)}
+.arsenal .robot:hover{filter:none;transform:translateX(-50%) translateY(-2%) scale(1.06);z-index:30}
+.robot:hover::before{opacity:1}
+.robot:hover .robot-body{background:linear-gradient(180deg,#2c2f35,#181a1e 50%,#0d0e11)}
+.robot:hover .robot-core,.robot:hover .robot-eyes i{box-shadow:0 0 22px 5px var(--glow)}
+
+/* locked / coming soon */
+.robot.is-locked{filter:grayscale(.7) brightness(.45)}
+.robot.is-locked .robot-core,.robot.is-locked .robot-eyes i{background:#6a6358;box-shadow:none}
+.robot.is-locked .robot-lock{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);
+  font-family:var(--fr-mono);font-size:9px;letter-spacing:.2em;color:var(--muted);
+  border:1px solid var(--line-soft);padding:3px 6px;background:rgba(0,0,0,.5)}
+
+/* tooltip */
+.robot-tooltip{position:absolute;left:50%;top:-12%;transform:translate(-50%,8px);
+  white-space:nowrap;text-align:center;opacity:0;pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.robot:hover .robot-tooltip{opacity:1;transform:translate(-50%,0)}
+.robot-tooltip b{display:block;font-family:var(--fr-display);font-weight:700;font-size:clamp(14px,1.3vw,20px);
+  letter-spacing:.04em;color:var(--text)}
+.robot-tooltip span{font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.28em;
+  color:var(--amber-soft);text-transform:uppercase}
+.robot-tooltip i{display:block;width:1px;height:14px;margin:6px auto 0;background:var(--line)}
+
+/* ============================================================
+   HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
+   ============================================================ */
+.hall-title{position:absolute;top:5.5%;left:50%;transform:translateX(-50%) translateY(-8px);
+  z-index:12;text-align:center;pointer-events:none;opacity:0;
+  transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0)}
+.ht-main{display:block;font-family:var(--fr-display);font-weight:800;
+  font-size:clamp(26px,5.4vw,80px);letter-spacing:.26em;line-height:1;
+  color:transparent;-webkit-text-stroke:1px rgba(255,217,160,.5);
+  text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em}
+.ht-sub{display:block;margin-top:14px;font-family:var(--fr-mono);font-size:clamp(8px,.8vw,11px);
+  letter-spacing:.52em;text-transform:uppercase;color:var(--muted);padding-left:.52em}
+
+/* ============================================================
+   TRANSITION BEAT — scrub done → bloom flash + SYSTEM ONLINE → Page 2
+   ============================================================ */
+.flash{z-index:30;pointer-events:none;opacity:0;
+  background:radial-gradient(62% 52% at 50% 46%, rgba(255,238,205,.96), rgba(255,170,70,.45) 42%, transparent 74%)}
+.stage.is-flash .flash{animation:flashbeat 1.05s var(--ease) forwards}
+@keyframes flashbeat{0%{opacity:0}16%{opacity:1}100%{opacity:0}}
+
+.sys-online{position:absolute;inset:0;z-index:31;display:grid;place-items:center;pointer-events:none;opacity:0}
+.stage.is-flash .sys-online{animation:syson 1.3s var(--ease) forwards}
+.sys-online span{font-family:var(--fr-mono);font-weight:700;font-size:clamp(12px,1.5vw,19px);
+  letter-spacing:.5em;text-transform:uppercase;color:var(--warm);
+  text-shadow:0 0 26px rgba(255,180,84,.75);padding-left:.5em}
+@keyframes syson{0%{opacity:0;letter-spacing:.24em}24%{opacity:1}68%{opacity:1}100%{opacity:0;letter-spacing:.62em}}
+
+/* unit-nav (bottom strip) */
+.unit-nav{position:absolute;left:0;right:0;bottom:0;z-index:13;
+  display:flex;gap:2px;padding:0 clamp(14px,2.4vw,34px) clamp(14px,2vw,26px);
+  opacity:0;transition:opacity .8s var(--ease);overflow-x:auto;scrollbar-width:none}
+.unit-nav::-webkit-scrollbar{display:none}
+.stage.is-arsenal .unit-nav{opacity:1}
+.unit-nav-rail{display:flex;gap:0;width:100%;border-top:1px solid var(--line-soft);padding-top:12px}
+.unit{flex:1;min-width:84px;display:flex;flex-direction:column;gap:5px;padding:8px 12px;
+  border-left:1px solid var(--line-soft);background:transparent;border-top:0;border-right:0;border-bottom:0;
+  text-align:left;transition:background .3s var(--ease);position:relative;pointer-events:auto;cursor:pointer}
+.unit:first-child{border-left:0}
+.unit:hover,.unit.is-active{background:linear-gradient(180deg,rgba(244,169,58,.10),transparent)}
+.unit::after{content:"";position:absolute;left:0;top:-13px;width:0;height:2px;background:var(--amber);
+  box-shadow:0 0 10px var(--amber);transition:width .35s var(--ease)}
+.unit:hover::after,.unit.is-active::after{width:100%}
+.unit-id{font-family:var(--fr-mono);font-size:10px;letter-spacing:.2em;color:var(--amber-soft)}
+.unit-name{font-family:var(--fr-display);font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--text)}
+.unit-type{font-family:var(--fr-mono);font-size:8.5px;letter-spacing:.22em;color:var(--muted-2);text-transform:uppercase}
+.unit.is-locked{opacity:.4}
+.unit.is-locked .unit-name{color:var(--muted)}
+
+/* ============================================================
+   ATMOSPHERE LAYERS
+   ============================================================ */
+.layer-vignette{z-index:10;
+  background:radial-gradient(130% 110% at 50% 40%, transparent 36%, rgba(0,0,0,.5) 80%, rgba(0,0,0,.86) 100%)}
+.layer-scan{z-index:11;opacity:0;transition:opacity .8s var(--ease);mix-blend-mode:overlay;
+  background:repeating-linear-gradient(to bottom, rgba(255,255,255,.03) 0 1px, transparent 1px 3px)}
+.stage[data-phase="3"] .layer-scan{opacity:.5}
+.layer-grain{z-index:14;opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.1s steps(3) infinite}
+@keyframes grain{0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-2%)}100%{transform:translate(0,0)}}
+
+/* ============================================================
+   DOSSIER PANEL
+   ============================================================ */
+.panel-scrim{position:fixed;inset:0;z-index:40;background:rgba(4,5,7,.55);
+  backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.panel-scrim.is-open{opacity:1;pointer-events:auto}
+.panel-host{position:fixed;inset:0;overflow:hidden;z-index:41;pointer-events:none}
+.panel{position:absolute;top:0;right:0;height:100%;width:min(480px,92vw);
+  background:linear-gradient(180deg,#0d1116,#080a0d);
+  border-left:1px solid var(--line);box-shadow:-30px 0 80px rgba(0,0,0,.6);
+  transform:translateX(100%);transition:transform .5s var(--ease);
+  display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin}
+.panel.is-open{transform:translateX(0)}
+.panel-accent{position:absolute;top:0;left:0;width:3px;height:100%;background:var(--glow,var(--amber));
+  box-shadow:0 0 20px var(--glow,var(--amber))}
+.panel-head{padding:30px 32px 22px;border-bottom:1px solid var(--line-soft);position:relative}
+.panel-back{display:inline-flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;
+  font-family:var(--fr-mono);font-size:10px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;
+  padding:0;margin-bottom:22px;transition:color .3s}
+.panel-back:hover{color:var(--amber-soft)}
+.panel-type{display:inline-block;font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--glow,var(--amber-soft));border:1px solid var(--line);
+  padding:5px 10px;margin-bottom:16px}
+.panel-desig{font-family:var(--fr-mono);font-size:9px;letter-spacing:.34em;color:var(--muted-2);text-transform:uppercase}
+.panel-name{font-family:var(--fr-display);font-weight:800;font-size:clamp(30px,4.4vw,46px);
+  letter-spacing:.02em;line-height:.98;margin:6px 0 4px}
+.panel-status{font-family:var(--fr-mono);font-size:10px;letter-spacing:.2em;color:var(--amber-soft)}
+.panel-img{margin:0 32px 4px;aspect-ratio:16/10;border:1px solid var(--line-soft);
+  background:linear-gradient(135deg,#13161b,#0a0c0f);position:relative;overflow:hidden;margin-top:24px}
+.panel-img .pi-fig{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:96%;aspect-ratio:140/240;
+  -webkit-mask:var(--mech) center/contain no-repeat;mask:var(--mech) center/contain no-repeat;
+  background:linear-gradient(180deg,#26292e,#0d0e11);filter:drop-shadow(0 0 30px var(--glow))}
+.panel-img .pi-grid{position:absolute;inset:0;opacity:.4;
+  background:linear-gradient(rgba(244,169,58,.06) 1px,transparent 1px) 0 0/100% 28px,
+            linear-gradient(90deg,rgba(244,169,58,.06) 1px,transparent 1px) 0 0/28px 100%}
+.panel-body{padding:24px 32px 40px;display:flex;flex-direction:column;gap:26px}
+.field-label{font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.32em;color:var(--muted-2);
+  text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:10px}
+.field-label::after{content:"";flex:1;height:1px;background:var(--line-soft)}
+.panel-brief{font-size:14.5px;line-height:1.65;color:#c9c2b5;text-wrap:pretty}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--fr-mono);font-size:10px;letter-spacing:.12em;color:var(--text);
+  border:1px solid var(--line-soft);padding:6px 11px;background:rgba(255,255,255,.02)}
+.stats{display:flex;flex-direction:column;gap:14px}
+.stat{display:grid;grid-template-columns:96px 1fr 38px;align-items:center;gap:12px}
+.stat-k{font-family:var(--fr-mono);font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.stat-bar{height:5px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
+.stat-bar i{position:absolute;left:0;top:0;height:100%;width:var(--v,0%);
+  background:linear-gradient(90deg,var(--glow),var(--warm));box-shadow:0 0 12px var(--glow)}
+.stat-v{font-family:var(--fr-mono);font-size:11px;color:var(--text);text-align:right}
+.panel-links{display:flex;gap:10px;flex-wrap:wrap}
+.btn-link{flex:1;min-width:130px;text-align:center;text-decoration:none;
+  font-family:var(--fr-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  padding:13px 16px;border:1px solid var(--line);color:var(--text);background:rgba(244,169,58,.05);
+  transition:background .3s,color .3s}
+.btn-link:hover{background:var(--amber);color:#1a1206}
+.btn-link.ghost{background:transparent;border-color:var(--line-soft);color:var(--muted)}
+.btn-link.ghost:hover{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.03)}
+
+/* ============================================================
+   RETICLE
+   ============================================================ */
+.reticle{position:fixed;top:0;left:0;width:34px;height:34px;z-index:60;pointer-events:none;
+  transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .25s var(--ease),height .25s var(--ease)}
+.reticle::before,.reticle::after{content:"";position:absolute;background:#fff}
+.reticle::before{left:50%;top:50%;width:1px;height:10px;transform:translate(-50%,-50%)}
+.reticle::after{left:50%;top:50%;width:10px;height:1px;transform:translate(-50%,-50%)}
+.reticle .r-ring{position:absolute;inset:0;border:1px solid rgba(255,255,255,.5);border-radius:50%;
+  transition:opacity .25s,border-radius .25s}
+.reticle.lock-on{width:54px;height:54px}
+.reticle.lock-on .r-ring{opacity:0}
+.reticle .r-corner{position:absolute;width:9px;height:9px;opacity:0;transition:opacity .25s}
+.reticle.lock-on .r-corner{opacity:1}
+.r-corner.tl{top:0;left:0;border-top:1.5px solid #fff;border-left:1.5px solid #fff}
+.r-corner.tr{top:0;right:0;border-top:1.5px solid #fff;border-right:1.5px solid #fff}
+.r-corner.bl{bottom:0;left:0;border-bottom:1.5px solid #fff;border-left:1.5px solid #fff}
+.r-corner.br{bottom:0;right:0;border-bottom:1.5px solid #fff;border-right:1.5px solid #fff}
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+#loader{position:fixed;inset:0;z-index:100;background:var(--bg-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;
+  transition:opacity .8s var(--ease),visibility .8s}
+#loader.is-done{opacity:0;visibility:hidden}
+.ld-mark{width:54px;height:54px;position:relative;animation:spin 8s linear infinite}
+.ld-mark::before,.ld-mark::after{content:"";position:absolute;inset:0;border:1.5px solid var(--amber)}
+.ld-mark::before{transform:rotate(45deg);opacity:.5}
+.ld-mark::after{inset:34%;background:var(--amber);box-shadow:0 0 18px var(--amber);border:0;
+  animation:pulse 1.6s infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-title{font-family:var(--fr-display);font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:.18em}
+.ld-status{font-family:var(--fr-mono);font-size:11px;letter-spacing:.34em;color:var(--muted);text-transform:uppercase}
+.ld-bar{width:min(280px,60vw);height:2px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.ld-bar i{position:absolute;left:0;top:0;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--amber),var(--warm));box-shadow:0 0 12px var(--amber)}
+.ld-pct{font-family:var(--fr-mono);font-size:11px;letter-spacing:.2em;color:var(--amber-soft)}
+
+/* progress indicator (right edge) */
+.progress{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:20;
+  display:flex;flex-direction:column;gap:9px;opacity:0;transition:opacity .6s}
+body:not(.is-loading) .progress{opacity:1}
+.progress i{width:5px;height:5px;border:1px solid var(--line-soft);border-radius:50%;transition:all .3s}
+.progress i.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 8px var(--amber)}
+
+/* ============================================================
+   RESPONSIVE — mobile: robots become horizontal scroller, labels always visible
+   ============================================================ */
+@media (max-width:760px){
+  .scroll-track{height:480vh}
+  .hud-tr{display:none}
+  .arsenal{display:flex;align-items:flex-end;gap:18px;overflow-x:auto;
+    padding:0 24px 120px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .arsenal::-webkit-scrollbar{display:none}
+  .arsenal-floor{display:none}
+  .robot{position:relative;left:auto;bottom:auto;transform:none;
+    width:46vw;flex:none;scroll-snap-align:center}
+  .robot,.arsenal:hover .robot{filter:none}
+  .robot-tooltip{position:relative;left:auto;top:auto;transform:none;opacity:1;margin-top:10px}
+  .robot-tooltip i{display:none}
+  .robot:hover{transform:none}
+  .unit-nav{display:none}
+}
+
+/* ============================================================
+   REDUCED MOTION — skip the scrub, jump straight to the lit arsenal
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  .scroll-track{height:100vh}
+  #revealCanvas{transition:none}
+  #userParticle{display:none}
+  .layer-grain,.uh-arrow{animation:none}
+  .robot{transition:none}
+}

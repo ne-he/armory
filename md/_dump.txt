@@ -1,0 +1,498 @@
+===== PARAGRAPHS =====
+GAMBARAN OVERVIEW AKHIR:
+Page 1 — Saat Lu Buka Website: Layar hitam. Di tengah, lu (particle hologram) berdiri glow. Di belakang, bayangan 10 robot di display cases (hampir nggak keliatan). Ada hint: "Scroll to Activate"
+Lu Scroll: Cahaya di belakang mulai naik — bukan karena overlay dibuka, tapi karena video-nya berubah frame dari gelap ke terang. Lampu display cases nyala satu per satu (natural dari AI). Robot mulai kelihatan bentuknya. Lu (particle) mulai glitch dan dissolve.
+Scroll Puncak: Terang penuh. Robot sudah kelihatan jelas. Lu menghilang. Layar crossfade ke Page 2.
+Page 2 — The Arsenal: Video loop jalan (debu bergerak, cahaya berkedip). 10 robot PNG berdiri di display cases. Bisa di-hover — glow biru muncul, title project slide in. Bisa di-klik — detail project muncul.
+🏗️ ARSITEKTUR 3 FASE
+FASE 1: "THE DARK STAGE" (0% – 40% Scroll)
+Isi Layer:
+plain
+z-0: Video 1 (Frame 0: gelap total, robot hampir invisible)
+z-1: Particle.js / DOM User (Lu di tengah, glowing subtle)
+z-2: Vignette Overlay (gelap, focus ke user)
+z-3: UI Hint ("Scroll to activate")
+Behavior:
+Video 1 di-scrub: Frame 0 = lampu mati.
+Scroll 0-40% = Video 1 scrub dari 0% ke 40% durasi. Cahaya mulai naik. Robot di background mulai kelihatan siluet.
+User (lu) di tengah: Particle.js idle, breathing glow. Bisa di-hover (muncul "About Me" atau nama).
+Tidak ada interaksi robot di sini. Robot masih "sleeping" di video.
+FASE 2: "THE AWAKENING" (40% – 80% Scroll)
+Isi Layer:
+plain
+z-0: Video 1 (Scrub 40% → 100%, lampu naik penuh, robot fully visible)
+z-1: User Particle (Mulai dissolve & scatter)
+z-2: Light Bloom Overlay (nyala di sekitar robot)
+z-3: Robot PNG (Opacity 0, sudah di-render tapi invisible, siap match-cut)
+Behavior:
+40-60%: Video 1 scrub ke 70%. Cahaya ruangan naik signifikan. Robot di video sudah kelihatan detail (tapi masih di dalam video, belum interaktif).
+60-70%: User (lu) dissolve. Particle.js explode outward atau fade to transparent. Efek: "Creator steps back. The work speaks."
+70-80%: Video 1 scrub ke 100% (frame paling terang). Robot di video fully lit.
+Di titik 80%: Trigger Match-Cut Transisi → Video 1 crossfade ke Video 2. Robot PNG (yang selama ini invisible di atas) fade in ke opacity 1.
+FASE 3: "THE ARSENAL" (80% – 100% Scroll + Settle)
+Isi Layer:
+plain
+z-0: Video 2 (Idle loop: ruangan terang, ambience hidup, partikel, cahaya bergerak)
+z-1: Robot PNG 1-10 (Absolute positioned, match posisi display cases di video)
+z-2: Glow Overlay (per-robot, muncul saat hover)
+z-3: UI Project (Title & Detail, muncul saat hover/klik)
+z-4: Cursor Custom (reticle/hologram pointer)
+Behavior:
+Video 2: Loop seamless. Ada gerakan ambience (debu, cahaya flicker, hologram UI di dinding). Camera tetap static.
+Robot PNG: 10 file individual. Posisi absolute di atas display cases di Video 2.
+Hover Robot: Glow radial muncul di sekitar robot + Project Title slide in.
+Klik Robot: Robot "step forward" (scale up) atau buka modal/overlay detail project.
+User sudah tidak ada. Fokus 100% ke karya.
+🎬 ASSET PRODUKSI (Apa yang Harus Di-Generate)
+Table
+🔬 TEKNIS DETAIL
+1. Video Scrubbing (GSAP ScrollTrigger)
+Kenapa nggak image sequence (JPG)? Lu bilang "shot jpg". Gue sangat menyarankan jangan. 5 detik @ 30fps = 150 JPG. Preload 150 gambar = browser nangis. Pakai video MP4 yang di-scrub.
+JavaScript
+const video1 = document.querySelector('#video-awakening');
+const video2 = document.querySelector('#video-idle');
+// Video 1: Scrub via scroll
+gsap.to(video1, {
+currentTime: video1.duration,
+ease: "none",
+scrollTrigger: {
+trigger: ".stage-container",
+start: "top top",
+end: "+=1500", // 1500px scroll untuk full transisi
+pin: true,
+scrub: 0.5,
+onUpdate: (self) => {
+// Di 80% progress, trigger transisi ke Video 2
+if (self.progress > 0.8 && !transitioned) {
+transitioned = true;
+activateArsenal();
+}
+}
+}
+});
+function activateArsenal() {
+// 1. User dissolve
+gsap.to('.user-particle', { opacity: 0, scale: 1.2, duration: 0.8 });
+// 2. Video 1 fade out, Video 2 fade in
+gsap.to('#video-awakening', { opacity: 0, duration: 1 });
+gsap.to('#video-idle', { opacity: 1, duration: 1, delay: 0.5 });
+// 3. Robot PNG fade in (match-cut)
+gsap.to('.robot-png', {
+opacity: 1,
+stagger: 0.08,
+duration: 0.6,
+delay: 0.8
+});
+// 4. Enable interaksi
+document.querySelectorAll('.robot-png').forEach(r => {
+r.classList.add('interactive');
+});
+}
+Critical: Video 1 harus preload full sebelum scroll. Kalau nggak, scrubbing akan patah-patah (buffering).
+HTML
+<<video id="video-awakening" preload="auto" muted playsinline>
+<source src="awakening.mp4" type="video/mp4">
+</video>
+2. User (Lu) sebagai Particle.js / DOM
+Lu bilang udah punya particle.js yang bisa di-hover. Struktur:
+HTML
+<div class="user-container" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 10;">
+<!-- tsParticles canvas -->
+<div id="tsparticles"></div>
+<!-- Hit area untuk hover -->
+<div class="user-hitbox" style="width: 200px; height: 300px;"></div>
+</div>
+Hover User:
+css
+.user-hitbox:hover ~ .user-label,
+.user-hitbox:hover ~ .user-glow {
+opacity: 1;
+}
+Dissolve saat transisi: Particle.js bisa di-trigger "explode" — semua particle bergerak radial outward, lalu opacity 0. Ini lebih cinematic daripada fade biasa.
+3. Robot PNG Positioning (Match-Cut)
+Ini yang paling krusial. Robot di Video 1 ending harus sejajar pixel-perfect dengan Robot PNG di Video 2.
+Cara setup:
+Screenshot frame terakhir Video 1 (ruangan terang, robot visible).
+Screenshot frame awal Video 2 (ruangan terang, tanpa robot).
+Pastikan kedua screenshot identik untuk background/perspektif/cahaya. Kalau beda, match-cut akan "glitch".
+Di Figma/Photoshop: Ukur koordinat setiap robot dalam persentase.
+Tempel Robot PNG di CSS dengan koordinat yang sama.
+css
+.robot-container {
+position: absolute;
+inset: 0;
+z-index: 20;
+pointer-events: none; /* Diaktifkan setelah transisi */
+}
+.robot {
+position: absolute;
+opacity: 0; /* Awal: invisible */
+transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+pointer-events: auto;
+cursor: pointer;
+}
+/* Posisi hardcoded berdasarkan frame video */
+.robot-1 { left: 7%; top: 18%; width: 11%; }
+.robot-2 { left: 20%; top: 18%; width: 11%; }
+.robot-3 { left: 33%; top: 18%; width: 11%; }
+/* ... dst untuk 10 robot */
+Hover State:
+css
+.robot:hover {
+transform: scale(1.08);
+filter: brightness(1.2) drop-shadow(0 0 30px rgba(0, 200, 255, 0.6));
+}
+.robot::after {
+/* Glow layer */
+content: '';
+position: absolute;
+inset: -10%;
+background: radial-gradient(circle, rgba(0,200,255,0.4), transparent 70%);
+opacity: 0;
+transition: opacity 0.3s;
+pointer-events: none;
+}
+.robot:hover::after {
+opacity: 1;
+}
+4. Video 2: Idle Ambience
+Spec untuk generate:
+Same camera position persis seperti Video 1.
+Ruangan terang penuh (seperti frame akhir Video 1).
+Tidak ada robot di video, atau robot dalam bentuk siluet gelap (jadi nggak clash dengan PNG di atas).
+Ambience:
+Partikel debu bergerak pelan (bisa juga dibuat via CSS/Canvas di atas video).
+Cahaya dari display cases berkedip subtle.
+Hologram UI di dinding bergerak/refresh.
+Fog/mist pelan di lantai.
+Kenapa nggak semua ambience di-CSS saja? Bisa, tapi video AI lebih organic. Hybrid: Video 2 untuk cahaya/gerakan besar, CSS overlay untuk partikel tambahan.
+🎮 FLOW INTERAKSI LENGKAP
+Table
+⚠️ CRITICAL NOTES (Jujur Soal Teknis)
+1. "Shot JPG" vs Video Scrubbing
+Lu bilang "shot jpg". Gue sangat menyarankan:
+Jangan pakai image sequence JPG untuk scrubbing. Preload-nya berat, memory bloat, mobile bakal crash.
+Pakai video MP4 yang di-scrub via currentTime. Browser handle decoding-nya lebih efisien.
+Exception: Kalau lu butuh transparan (video dengan alpha channel), baru pakai image sequence PNG/WebP — tapi itu untuk objek, bukan background.
+2. Match-Cut Precision
+Kalau Video 1 ending dan Video 2 frame 0 tidak identik, transisi akan "jump" (patah). Solusi:
+Crossfade 1 detik antara Video 1 dan Video 2. Manusia nggak notice small mismatch kalau ada crossfade.
+Robot PNG fade in di tengah crossfade, jadi perhatian user ke robot, bukan ke background.
+3. Robot di Video 1 vs PNG
+Di Video 1, robot ada (gelap→terang). Di Fase 3, robot PNG muncul di atas Video 2.
+Potential issue: Orang bisa notice kalau robot di Video 1 dan PNG "beda sedikit" (pose, lighting, detail).
+Solusi:
+Generate robot PNG dengan pose yang sama persis dengan robot di Video 1. Gunakan reference image dari frame Video 1 sebagai image prompt di Midjourney.
+Atau: Di Video 1, robot sengaja dibuat blur/siluet saja (nggak detail), jadi orang nggak expect detail. Pas Fase 3, PNG detail muncul sebagai "surprise reveal".
+4. Particle.js Performance
+Kalau particle user lu kompleks (10.000 particle), di mobile bakat lag.
+Solusi: Deteksi mobile → reduce particle count, atau ganti jadi CSS animation sederhana.
+🧠 DEEP THINKING: IDE TAMBAHAN
+A. "The Power-Up Sound"
+Tambah audio layer:
+Fase 1: Low hum (generator standby).
+Fase 2: Pitch naik saat cahaya naik. "Power surge" sound effect.
+Fase 3: Ambient lab (fan, computer beep, hologram sfx).
+Hover Robot: Mechanical servo sound + UI beep.
+B. "Holographic Cursor"
+Cursor mouse di-replace dengan reticle/crosshair futuristik. Saat hover robot, reticle "lock on" (berubah jadi kotak hijau + tracking lines).
+C. "Project = Armor Specs"
+Saat klik robot, jangan buka modal biasa. Buka "HUD Interface":
+Nama project = Armor Model Name (misal: "Mark-IV: E-Commerce Platform")
+Stats: Creativity: 95%, Technical: 88%, Impact: 92%
+Tech stack = "Armor Components" (React, Node.js, etc.)
+Screenshots = "Armor Schematics"
+D. "Mobile: Tap to Activate"
+Di mobile, scroll tetap trigger Fase 1→2. Tapi untuk robot, gunakan horizontal swipe untuk browse (carousel), bukan hover. Tap = open detail.
+E. "Loading Screen"
+Sebelum video siap, tampilkan "System Booting" animation (kayak Jarvis startup). Baru masuk ke Fase 1. Ini buy time untuk preload video.
+📋 CHECKLIST EKSEKUSI
+Week 1: Asset Generation
+[ ] Generate Video 1 (Awakening): Test 3 prompt, pilih yang camera paling static.
+[ ] Generate Video 2 (Idle): Pastikan perspective match Video 1.
+[ ] Screenshot frame akhir Video 1 → jadi reference untuk generate Robot PNG.
+[ ] Generate 10 Robot PNG (gunakan reference image yang sama untuk konsistensi).
+[ ] Setup User Particle.js (tsParticles) dengan hover interaction.
+Week 2: Dev Core
+[ ] Implementasi Video 1 scrubbing dengan GSAP ScrollTrigger.
+[ ] Implementasi User dissolve + Particle explode.
+[ ] Match-cut transisi Video 1 → Video 2.
+[ ] Posisi 10 Robot PNG di atas Video 2.
+Week 3: Interaksi & Polish
+[ ] Hover/click robot + glow effect.
+[ ] Project detail modal/HUD.
+[ ] Audio layer (optional).
+[ ] Responsive (mobile layout).
+✅ KESIMPULAN
+Struktur lu sekarang clean dan executable:
+User = Particle.js (terpisah, interaktif, bisa dissolve).
+Video 1 = Transisi pencahayaan (gelap→terang, di-scrub scroll, robot di dalam video sebagai "teaser").
+Video 2 = Idle ambience (loop, terang, tanpa robot detail).
+Robot = PNG terpisah (muncul setelah transisi, interaktif, hoverable, clickable).
+Satu hal yang paling penting: Video 1 dan Video 2 harus seamless di transisi. Crossfade + robot PNG staggered fade-in akan menyamarkan perbedaan.
+PAGE 1: MEKANISME SCROLL
+Konsep: Video cuma 1 file (5-8 detik). Start = gelap total. End = terang penuh. Video tidak loop. Video di-pause. Scroll lu mengontrol "frame" yang ditampilkan — kayak seek bar YouTube, tapi pakai scroll mouse.
+🖼️ Visualisasi per Scroll
+plain
+┌─────────────────────────────────────────────────────────────┐
+│  SCROLL 0%  (Frame Awal)                                     │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  Video: GELAP TOTAL. Hanya siluet user (particle) di tengah │
+│  Robot: BAYANGAN HITAM di belakang (hampir nggak keliatan)  │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  SCROLL 30%  (Frame Tengah)                                  │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  │  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  Video: LAMPU DISPLAY mulai nyala redup. Cahaya biru muncul   │
+│  Robot: SILUET BIRU di display cases (mulai kelihatan bentuk)│
+│  User: Particle masih glow, mulai "glitch"                  │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  SCROLL 70%  (Frame Akhir)                                   │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                                                     │    │
+│  │    [R1]  [R2]  [R3]  [R4]  [R5]  [R6]  [R7]  [R8]  │    │
+│  │      │      │      │      │      │      │      │     │    │
+│  │      ▼      ▼      ▼      ▼      ▼      ▼      ▼     │    │
+│  │   ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  │    │
+│  │   │███│  │███│  │███│  │███│  │███│  │███│  │███│  │    │
+│  │   └───┘  └───┘  └───┘  └───┘  └───┘  └───┘  └───┘  │    │
+│  │                                                     │    │
+│  │              [USER - Particle Fade Out]               │    │
+│  │                                                     │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  Video: TERANG PENUH. Detail robot di video keliatan jelas    │
+│  Robot: FULLY VISIBLE (tapi masih di dalam video, bukan PNG)│
+│  User: Particle mulai dissolve, opacity 50%                 │
+└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  SCROLL 100% (Trigger Page 2)                                │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                                                     │    │
+│  │    [R1]  [R2]  [R3]  [R4]  [R5]  [R6]  [R7]  [R8]  │    │
+│  │      ▲      ▲      ▲      ▲      ▲      ▲      ▲     │    │
+│  │      │      │      │      │      │      │      │     │    │
+│  │   ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  ┌───┐  │    │
+│  │   │▓▓▓│  │▓▓▓│  │▓▓▓│  │▓▓▓│  │▓▓▓│  │▓▓▓│  │▓▓▓│  │    │
+│  │   └───┘  └───┘  └───┘  └───┘  └───┘  └───┘  └───┘  │    │
+│  │                                                     │    │
+│  │              [USER - HILANG TOTAL]                   │    │
+│  │                                                     │    │
+│  └─────────────────────────────────────────────────────┘    │
+│  TRANSISI: Crossfade ke Video 2 (Idle) + Robot PNG muncul   │
+└─────────────────────────────────────────────────────────────┘
+Apa yang Berubah Saat Scroll?
+Table
+Kode Inti (GSAP)
+JavaScript
+const video = document.querySelector('#video-awakening');
+// Video harus preload dulu
+video.addEventListener('loadedmetadata', () => {
+gsap.to(video, {
+currentTime: video.duration, // Scrub dari 0 ke akhir
+ease: "none",
+scrollTrigger: {
+trigger: ".page-1",
+start: "top top",
+end: "+=1200", // 1200px scroll untuk complete
+pin: true,     // Page 1 nggak geser, cuma scroll trigger
+scrub: 0.5,    // Smooth, bisa di-scroll balik
+}
+});
+});
+REFERENSI GAMBAR:
+Nah gelapnya kek gini, jadi kek robotnya digelapin sebelum ntr animasinya ke terang. Terangnya tu kek smuanya nyala, robotnya juga nyala ajdi bagus, jadi temanya dark light gt, jangan cyan ya. Kek realsteel si jatohnya campur sama ironman untuk genrate robotnya.
+SPESIFIKASI GENERATE:
+bikin "X-ray/Ghost mode" di video — robot cuma eksis sebagai jalur cahaya yang mengikuti struktur badan. Nggak perlu match warna, nggak perlu match detail armor. Yang penting siluet & proporsi kasar sama.
+⚡ BLUEPRINT: "THE GHOST ARMORY"
+🎯 Konsep Visual
+Table
+Analogi: Kayak lihat Iron Man di gelap total — cuma mata & arc reactor yang kelihatan. Atau kayak Tron suit sebelum dinyalain penuh.
+🛠️ WORKFLOW GENERATE (4 Step)
+STEP 1: Generate 1 "Master Skeleton" (Referensi untuk Video)
+Lu generate 1 robot dulu. Ini jadi "patokan" buat AI video paham proporsi & pose.
+Prompt Midjourney / SDXL:
+"Full body front view of dark tech mech suit, Real Steel Zeus inspired, matte black armor, symmetrical, standing straight at attention, neutral pose, arms at sides, facing camera directly, dark studio background, rim light, 8k, octane render --ar 2:3 --v 6"
+Kenapa cuma 1? Karena ke video generator lu cuma bisa kasih 1 image prompt (atau maks 2-3). Lu pilih 1 yang paling "generic" — proporsi bahu, dada, kaki yang representatif.
+Save ini sebagai: master-skeleton.jpg
+STEP 2: Generate Video Page 1 (The Ghost Armory)
+Platform: Runway Gen-3 / Kling / Pika
+Upload: master-skeleton.jpg sebagai Image Prompt
+Prompt Text (Copy-paste ini persis):
+"Static locked camera, wide shot of futuristic dark armory hall, 10 robotic suits standing in display cases in curved wall, camera does not move, suits are completely invisible in darkness, only visible by their own emitted light, thin cyan and white glowing lines tracing body structure, chest reactor faint glow, no external light on suits, no color on armor, pure darkness, silhouette defined only by internal glow, cinematic, moody, 4k, seamless loop"
+Settings:
+Camera Motion: Static / Locked / None
+Motion Strength: Low (10-20%)
+Duration: 5-8 detik
+Yang harus terjadi di video:
+Frame 0: Gelap total. Hampir nggak keliatan apa-apa. Mungkin cuma 1-2 titik cahaya redup.
+Frame akhir: Cahaya naik. 10 robot kelihatan sebagai "rangka cahaya" — garis-garis tipis cyan/putih mengikuti bahu, lengan, dada, kaki. Chest reactor redup menyala. Tapi tidak ada warna hijau, merah, biru pada armor. Cuma cahaya struktural.
+Kenapa ini works?
+AI video lihat master-skeleton.jpg → paham "oh ini mech suit"
+Prompt kasih instruksi kuat: "only visible by emitted light"
+Hasil: 10 robot di video punya siluet & proporsi mirip master, tapi cuma kelihatan sebagai "ghost outline"
+STEP 3: Generate 10 Robot PNG (Full Color untuk Page 2)
+Ini yang bakal jadi interactive assets di Page 2.
+Base Prompt:
+"Full body front view of dark tech mech suit, Real Steel Zeus inspired, matte black armor, [COLOR] neon tube accents, glowing [COLOR] chest reactor, symmetrical, standing straight, activated mode, bright studio lighting, 8k, octane render --ar 2:3 --v 6"
+Variasi Warna (Accent) per Robot:
+Table
+Pose: Semua sama persis — standing straight, facing camera. Ini penting biar posisi di display case konsisten.
+Background: Transparan (remove.bg / Photoshop / Photoroom).
+STEP 4: Posisikan di Web
+Page 1:
+plain
+Video: ghost-armory.mp4 (loop tapi di-scrub)
+User: Particle.js di tengah (hologram cyan)
+Page 2:
+plain
+Video: (opsional — bisa video ambience ruangan terang, atau static image)
+Robot PNG: 10 file, absolute positioned, match posisi display cases di video
+🎨 VISUALISASI BEDA "GHOST" vs "FULL COLOR"
+Ghost Mode (Video Page 1)
+plain
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░  ╭━━━━━━━━━━━━━━━━━━━━━╮   ░░
+░░  ┃  ◉━━━━━━━━━━━━━━━◉  ┃   ░░  ← Mata: garis cahaya tipis
+░░  ┃  ┃               ┃  ┃   ░░
+░░  ┃  ┃    ◎━━━━━◎    ┃  ┃   ░░  ← Chest reactor: lingkaran redup
+░░  ┃  ┃    ┃     ┃    ┃  ┃   ░░
+░░  ┃  ┃    ┃     ┃    ┃  ┃   ░░
+░░  ┃  ┃    ┃     ┃    ┃  ┃   ░░
+░░  ╰━━┻━━━━┻━━━━━┻━━━━┻━━╯   ░░
+░░     │      │      │        ░░
+░░    ═╧══════╧══════╧═       ░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+Background: HITAM TOTAL
+Yang keliatan: Cuma garis-garis cyan/putih (2-3px) mengikuti kontur
++ chest reactor redup
++ mungkin sedikit glow di joints
+Full Color Mode (PNG Page 2)
+plain
+┌─────────────────────────────────┐
+│  ╭━━━━━━━━━━━━━━━━━━━━━╮        │
+│  ┃  🔴━━━━━━━━━━━━━━━🔴  ┃        │  ← Mata: bright red
+│  ┃  ┃               ┃  ┃        │
+│  ┃  ┃    🔴━━━━━🔴    ┃  ┃        │  ← Chest reactor: bright
+│  ┃  ┃    ┃     ┃    ┃  ┃        │
+│  ┃  ┃    ┃     ┃    ┃  ┃        │
+│  ┃  ┃    ┃     ┃    ┃  ┃        │
+│  ╰━━┻━━━━┻━━━━━┻━━━━┻━━╯        │
+│     │      │      │             │
+│    ═╧══════╧══════╧═            │
+└─────────────────────────────────┘
+Armor: Matte black + metal texture
+Accent: Warna neon (merah/biru/emas/etc.) di shoulder, chest, knees
+Detail: Scratches, panel lines, hydraulic, metal reflection
+📋 PROMPT SPESIFIK (Copy-Paste Ready)
+A. Midjourney — Master Skeleton (1 gambar untuk video)
+plain
+/imagine prompt: Full body front view of dark tech mech suit, Real Steel Zeus inspired, matte black armor, symmetrical, standing straight at attention, neutral pose, arms at sides, facing camera directly, dark studio background, subtle rim light, 8k, octane render, highly detailed mechanical joints --ar 2:3 --v 6 --s 250
+B. Runway Gen-3 — Video Ghost Armory
+Image Prompt: Upload master-skeleton.jpg
+Text Prompt:
+plain
+Static locked camera, wide shot of futuristic dark armory hall, 10 robotic suits standing in display cases arranged in curved wall, camera absolutely does not move, suits are completely invisible in darkness, only visible by their own emitted internal light, thin cyan and white glowing lines tracing body structure and mechanical joints, faint chest reactor glow, no external light on suits, no armor color visible, pure black silhouettes defined only by internal glow, dark ambient atmosphere, cinematic, 4k, moody
+Settings:
+Camera: Static
+Motion: Low
+C. Midjourney — 10 Robot Full Color (Page 2)
+Generate 10x dengan variasi:
+plain
+/imagine prompt: Full body front view of dark tech mech suit, Real Steel Zeus inspired, matte black armor, [COLOR] neon tube accents, glowing [COLOR] chest reactor, symmetrical, standing straight at attention, activated mode, bright cinematic lighting, rim light, clean transparent background, 8k, octane render --ar 2:3 --v 6 --s 250
+Ganti [COLOR]:
+crimson red
+electric blue
+gold
+violet
+emerald green
+orange
+white
+silver chrome
+magenta
+cyan
+🔄 ALTERNATIF SIMPLER (Kalau AI Video Nggak Nurut)
+Kalau Runway/Kling tetap generate robot dengan warna/terlalu detail:
+Post-Process di Premiere / After Effects / CapCut:
+Import video hasil AI.
+Tambahkan efek "Leave Color" — hanya simpan cyan/putih, sisanya jadi hitam.
+Atau: Hue/Saturation — turunin saturation semua kecuali cyan range.
+Atau: Curves — crush blacks (buat gelap lebih gelap), naikin cyan highlights.
+Tambahkan Glow pada area cyan/putih supaya lebih "neon".
+Hasil: Video tetap hanya nunjukin cahaya cyan/putih, armor jadi hitam total.
+✅ CHECKLIST EKSEKUSI
+Table
+🎯 KEUNTUNGAN WORKFLOW INI
+Nggak perlu match detail — video cuma kelihatan garis cahaya, PNG baru detail.
+Nggak perlu 10 gambar ke video generator — cukup 1 referensi.
+Transisi seamless — Page 1: robot = cahaya. Page 2: robot = cahaya + armor. Feels like "powering up" bukan "ganti gambar".
+User di tengah — particle hologram lu juga bisa pakai konsep sama: cuma cahaya cyan, nggak ada detail wajah/baju.
+
+===== TABLES =====
+--- TABLE 1 ---
+# | Asset | Format | Jumlah | Spec Detail | Generate Via
+A | Video 1: The Awakening | MP4/WebM | 1 | 5-8 detik. Camera ABSOLUTELY STATIC. Start: lampu mati, ruangan gelap, robot di display cases hampir invisible (siluet gelap). End: lampu penuh, ruangan terang, robot fully visible. JANGAN gerak kamera. | Runway / Pika / Kling
+B | Video 2: The Arsenal Idle | MP4/WebM | 1 | 4-6 detik loop. Camera same position seperti Video 1. Ruangan terang. Tidak ada robot (atau robot blur/siluet saja untuk depth). Ada ambience: debu, cahaya bergerak, hologram UI di dinding, partikel. Loop seamless. | Runway / Pika / Kling
+C | User (Lu) | Particle.js / DOM | 1 | Bukan video. Particle system atau PNG sequence dengan transparan. Idle breathing. Glow biru/cyan. Bisa di-hover. | Code (tsParticles) atau generate PNG sequence
+D | Robot PNG | PNG/WebP transparan | 10 | Front-facing atau 3/4 angle. Match lighting Video 2 (terang, rim light). Konsisten style. Resolusi tinggi (min 800px lebar). | Midjourney / SDXL + remove bg
+E | Robot Glow Map | PNG (opsional) | 10 | Same shape robot tapi hanya glow/bloom. Untuk efek "nyala" saat hover. Bisa juga dibuat via CSS. | Edit manual atau generate
+--- TABLE 2 ---
+User Action | Fase 1 | Fase 2 | Fase 3
+Scroll Down | Video 1 scrub. Cahaya naik. | Video 1 scrub ke terang. User dissolve. | Sudah di Fase 3. Scroll biasa (page scroll ke bawah untuk konten lain).
+Hover User | Glow + nama/tagline muncul. | - (User sudah hilang) | -
+Hover Robot | ❌ (Robot masih di video, nggak interaktif) | ❌ (Robot masih di video) | ✅ Glow + Project Title muncul.
+Klik Robot | ❌ | ❌ | ✅ Modal/Overlay detail project.
+Scroll Up | Video 1 reverse scrub (gelap lagi). | Reverse: User muncul kembali, video ke gelap. | Reverse transisi ke Fase 2 (kalau mau reversible).
+--- TABLE 3 ---
+Elemen | Scroll 0% | Scroll 50% | Scroll 100%
+Video Frame | Frame 0 (gelap) | Frame 60 (tengah) | Frame 120 (terang)
+Cahaya Ruangan | Mati total | Display cases nyala | Terang penuh
+Robot di Video | Bayangan hitam | Siluet biru | Detail terlihat
+User Particle | Glow penuh | Glitch + fade | Hilang (dissolve)
+Overlay | Vignette gelap 90% | Vignette 50% | Vignette 0%
+Interaksi | Hover User = About Me | Hover User = About Me | User hilang, tidak ada interaksi
+--- TABLE 4 ---
+Fase | Robot di Video | Robot di PNG (Page 2)
+Page 1 (Video) | Gelap total. Cuma garis cahaya tipis (cyan/putih) mengikuti kontur badan + chest reactor redup. Nggak ada warna armor. Nggak ada detail tekstur. | ❌ Nggak ada
+Page 2 (PNG) | ❌ Nggak ada | Full color. Armor matte black, neon accents warna-warni, detail tekstur, scratches, metal.
+--- TABLE 5 ---
+Unit | Warna Accent | Kode Prompt
+01 | Crimson Red | crimson red neon accents
+02 | Electric Blue | electric blue neon accents
+03 | Gold | gold neon accents
+04 | Violet | violet neon accents
+05 | Emerald | emerald green neon accents
+06 | Orange | orange neon accents
+07 | White | white neon accents
+08 | Silver | silver chrome accents
+09 | Magenta | magenta neon accents
+10 | Cyan | cyan neon accents
+--- TABLE 6 ---
+Step | Action | Output
+1 | Generate 1 Master Skeleton | master-skeleton.jpg
+2 | Generate Video Ghost Armory | ghost-armory.mp4 (5-8 detik)
+3 | (Opsional) Post-process video | Pastikan cuma cyan/putih yang keliatan
+4 | Generate 10 Robot Full Color | robot-01.png s/d robot-10.png (transparan)
+5 | Remove background 10 robot | PNG transparan
+6 | Posisikan di Page 2 | CSS absolute positioning
