@@ -1,0 +1,15 @@
+# Source archives (not needed to run the app)
+uploads/
+generated/ezgif-5341e10c66ec02b9-jpg.zip
+
+# Unused video assets
+generated/vanish.mp4
+generated/trio.mp4
+
+# Old/unused frame sets
+public/frames/
+public/frames_2/
+
+# OS
+.DS_Store
+Thumbs.db
