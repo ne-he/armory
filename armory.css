@@ -16,9 +16,9 @@
   --line:rgba(244,169,58,.20);
   --line-soft:rgba(236,228,214,.10);
   --ease:cubic-bezier(.2,.7,.2,1);
-  --fr-display:"Syne",sans-serif;
-  --fr-body:"Hanken Grotesk",sans-serif;
-  --fr-mono:"JetBrains Mono",monospace;
+  --fr-display:"Neue Machina","Space Grotesk",sans-serif;
+  --fr-body:"Space Grotesk",sans-serif;
+  --fr-mono:"Space Mono",monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:auto}
@@ -50,6 +50,48 @@ img{display:block;max-width:100%}
   overflow:hidden;background:var(--bg-2);
 }
 .layer{position:absolute;inset:0;pointer-events:none}
+
+/* ---- ONE-WAY FLOW: Page-1 scrub state vs locked Page-2 state ---- */
+body.is-scrubbing .scroll-track{height:340vh}        /* scroll room for the frame scrub */
+body.is-scrubbing .stage{position:sticky;top:0}
+body.is-locked{overflow:hidden;height:100vh}          /* Page 2: scroll is dead, no scroll-back */
+body.is-locked .scroll-track{height:100vh}
+body.is-locked .stage{position:fixed;inset:0;height:100vh;height:100svh}
+body.is-locked .progress,body.is-transition .progress{opacity:0}
+
+/* ---- TRANSITION / LOADING BEAT between Page 1 and Page 2 (both directions) ---- */
+.transition{position:fixed;inset:0;z-index:90;background:var(--bg-2);
+  display:grid;place-items:center;opacity:0;visibility:hidden;
+  transition:opacity .42s var(--ease),visibility .42s}
+body.is-transition .transition{opacity:1;visibility:visible}
+.tr-core{display:flex;flex-direction:column;align-items:center;gap:22px}
+.tr-ring{width:46px;height:46px;border:1.5px solid var(--line);border-top-color:var(--amber);
+  border-radius:50%;animation:spin .9s linear infinite}
+.tr-label{font-family:var(--fr-mono);font-size:11px;letter-spacing:.4em;color:var(--warm);
+  text-transform:uppercase;padding-left:.4em}
+.tr-bar{width:200px;height:2px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}
+.tr-bar i{position:absolute;top:0;left:0;height:100%;width:40%;
+  background:linear-gradient(90deg,transparent,var(--amber),transparent);
+  animation:trsweep 1.05s var(--ease) infinite}
+@keyframes trsweep{0%{transform:translateX(-130%)}100%{transform:translateX(360%)}}
+
+/* ---- POWER-DOWN button (Page 2 only) → returns to the dark hall ---- */
+.home-btn{position:absolute;top:22px;right:24px;z-index:15;
+  display:inline-flex;align-items:center;gap:9px;
+  background:rgba(8,10,13,.5);border:1px solid var(--line);color:var(--warm);
+  font-family:var(--fr-mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  padding:9px 14px;cursor:pointer;opacity:0;pointer-events:none;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:opacity .55s var(--ease) .35s,background .3s,border-color .3s,color .3s}
+.stage.is-arsenal .home-btn{opacity:1;pointer-events:auto}
+.home-btn:hover{background:rgba(244,169,58,.12);border-color:var(--amber);color:#fff}
+.hb-icon{font-size:13px;line-height:1}
+
+/* ---- CALIBRATE: freeze hover transforms/transitions so drag tracking is exact ---- */
+body.is-calibrate .robot{transition:none}
+body.is-calibrate .arsenal:hover .robot{filter:none}
+body.is-calibrate .arsenal .robot:hover{transform:translateX(-50%);filter:none}
+body.is-calibrate .home-btn{display:none}
 
 /* ---- PAGE-1 scrub canvas (newgif) + PAGE-2 idle loop ---- */
 #revealCanvas{z-index:1;width:100%;height:100%;display:block}
@@ -414,7 +456,7 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
 #loader{position:fixed;inset:0;z-index:100;background:var(--bg-2);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;
   transition:opacity .8s var(--ease),visibility .8s}
-#loader.is-done{opacity:0;visibility:hidden}
+#loader.is-done{opacity:0;visibility:hidden;pointer-events:none}  /* never intercept once done (esp. during the fade) */
 .ld-mark{width:54px;height:54px;position:relative;animation:spin 8s linear infinite}
 .ld-mark::before,.ld-mark::after{content:"";position:absolute;inset:0;border:1.5px solid var(--amber)}
 .ld-mark::before{transform:rotate(45deg);opacity:.5}
@@ -452,6 +494,8 @@ body:not(.is-loading) .progress{opacity:1}
   .robot-tooltip i{display:none}
   .robot:hover{transform:none}
   .unit-nav{display:none}
+  .home-btn .hb-label{display:none}
+  .home-btn{padding:9px;top:16px;right:16px}
 }
 
 /* ============================================================
