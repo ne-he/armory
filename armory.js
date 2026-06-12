@@ -19,8 +19,8 @@ const ROBOT_IMG = 'generated/robot2_clear.png';
 const LANGS_BY_ID = {
   '01':['Python','Jupyter'], '02':['Python','SQL','Docker'], '03':['Python','Shell'],
   '04':['Swift'], '05':['TypeScript','SQL','CSS'], '06':['JavaScript','HTML','CSS'],
-  '07':['JavaScript','HTML','CSS'], '08':['TypeScript','JavaScript','CSS'],
-  '09':['JavaScript','CSS','HTML'], '10':['Python','Shell','Docker'],
+  '07':['JavaScript','HTML','CSS'], '08':['Python','Shell','Docker'],
+  '09':['TypeScript','JavaScript','CSS'], '10':['JavaScript','CSS','HTML'],
 };
 function makeLangs(id){
   const names = LANGS_BY_ID[id] || ['Python'];
@@ -37,59 +37,60 @@ function makeLangs(id){
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
    ones receding into the hall. All share the placeholder PNG until the unique
-   robot-XX.png renders exist. The empty 11th json filler ("CLASSIFIED") is dropped;
-   PRIME (flagship) takes slot 10. */
+   robot-XX.png renders exist. Unit codenames are theatrical (ARBITER, KEYSTONE…)
+   while `name` stays the real project title. Order: 8 live first, the 2
+   coming_soon units (MNEMONIC, AEGIS) are pinned LAST so they read as locked. */
 const PROJECTS = [
-  { id:'01', unit:'CRIMSON', name:'Trash Classifier — CNN Benchmark', type:'Computer Vision / Deep Learning', class:'Striker', accent:'#e0312e',
+  { id:'01', unit:'ARBITER', name:'Trash Classifier — CNN Benchmark', type:'Computer Vision / Deep Learning', class:'Striker', accent:'#e0312e',
     x:'8.7%', y:'29.1%', w:'13.5vw', z:10, status:'live',
     summary:'Three CNN architectures battle over 6 waste classes.', tech:['PyTorch','ResNet50','EfficientNet','MobileNetV2','Grad-CAM'],
     description:`Multi-architecture benchmark on TrashNet (6 classes, 2,527 images) comparing ResNet50, EfficientNet-B0, and MobileNetV2 with selective fine-tuning, then fusing them in a soft-voting ensemble. Class imbalance is tamed with WeightedRandomSampler + label smoothing, and Grad-CAM heatmaps explain every prediction.`,
     stats:{pwr:86,spd:72,def:80}, links:{live:'',code:''} },
-  { id:'02', unit:'AZURE', name:'Feature Store MVP', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
+  { id:'02', unit:'KEYSTONE', name:'Feature Store MVP', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
     x:'18.2%', y:'30.8%', w:'11.5vw', z:8, status:'live',
     summary:'Production-grade feature store, end to end.', tech:['Python','PostgreSQL','Redis','FastAPI','Streamlit','Evidently','Docker'],
     description:`E-commerce feature store that ingests transaction data, computes 20+ user-level features in batch, stores them in PostgreSQL (offline) + Redis (online), and serves them through a low-latency FastAPI. A Streamlit dashboard with Evidently watches freshness and drift. All four milestones (ingestion → monitoring) shipped.`,
     stats:{pwr:90,spd:70,def:85}, links:{live:'',code:''} },
-  { id:'03', unit:'GOLD', name:'Waste Detection — CNN & Grad-CAM', type:'Deep Learning / Explainable AI', class:'Luminary', accent:'#e0a93a',
+  { id:'03', unit:'LANTERN', name:'Waste Detection — CNN & Grad-CAM', type:'Deep Learning / Explainable AI', class:'Luminary', accent:'#e0a93a',
     x:'26.8%', y:'32.3%', w:'9.5vw', z:6, status:'live',
     summary:'Notebook to production: 90.3% accuracy, explained.', tech:['TensorFlow/Keras','MobileNetV2','Grad-CAM','FastAPI','PyTest'],
     description:`Waste image classification on TrashNet refactored from a Jupyter notebook into a modular, config-driven, tested Python project. MobileNetV2 transfer learning hits 90.3% validation accuracy (baseline CNN: 54.5%), Grad-CAM highlights what the model actually looks at, and a FastAPI service + CLI make it usable beyond the notebook.`,
     stats:{pwr:84,spd:78,def:86}, links:{live:'',code:''} },
-  { id:'04', unit:'VIOLET', name:'SimpleNotes — SwiftUI', type:'Mobile / iOS', class:'Phantom', accent:'#8b4fd8',
+  { id:'04', unit:'SCRIBE', name:'SimpleNotes — SwiftUI', type:'Mobile / iOS', class:'Phantom', accent:'#8b4fd8',
     x:'34.8%', y:'32.6%', w:'9.1vw', z:5, status:'live',
     summary:'A featherweight iOS notes app, zero friction.', tech:['Swift','SwiftUI','iOS 16','UserDefaults'],
     description:`Native SwiftUI notes app for iOS 16+: create, edit, and categorize notes (personal/work/other with distinct colors), full-text search across title and body, swipe-to-share, bulk delete with confirmation, automatic UserDefaults persistence, and an animated splash screen.`,
     stats:{pwr:55,spd:90,def:60}, links:{live:'',code:''} },
-  { id:'05', unit:'EMERALD', name:'HCI Lab — Final Web Project', type:'Full-stack Web / Coursework', class:'Sage', accent:'#2fae6b',
+  { id:'05', unit:'COVENANT', name:'HCI Lab — Final Web Project', type:'Full-stack Web / Coursework', class:'Sage', accent:'#2fae6b',
     x:'42.6%', y:'32.8%', w:'8.3vw', z:2, status:'live',
     summary:'Type-safe monorepo; the API contract is the source of truth.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI','pnpm'],
     description:`Human-Computer Interaction lab final built as a TypeScript monorepo: Express 5 API with PostgreSQL + Drizzle ORM, Zod validation everywhere, and Orval generating API hooks + schemas straight from the OpenAPI spec — so frontend and backend can never drift apart.`,
     stats:{pwr:78,spd:74,def:76}, links:{live:'',code:''} },
-  { id:'06', unit:'ORANGE', name:'To-Do List Organizer', type:'Productivity Web App', class:'Forge', accent:'#e8742c',
+  { id:'06', unit:'CADENCE', name:'To-Do List Organizer', type:'Productivity Web App', class:'Forge', accent:'#e8742c',
     x:'50.2%', y:'31.6%', w:'8.8vw', z:4, status:'live',
     summary:'One dashboard for the whole day.', tech:['HTML/CSS/JS','Kiro AI'],
     description:`A clean productivity dashboard combining a live clock with greeting, a focus timer, a to-do list, and quick links in one interface. Built as a Software Engineering mini project with an AI-assisted (Kiro) workflow — fast to ship, simple to use.`,
     stats:{pwr:50,spd:95,def:55}, links:{live:'',code:''} },
-  { id:'07', unit:'WHITE', name:'Ask Nemi — Interactive Portfolio v3', type:'Creative Web / Interactive', class:'Pure', accent:'#f2ead8',
+  { id:'07', unit:'HERALD', name:'Ask Nemi — Interactive Portfolio v3', type:'Creative Web / Interactive', class:'Pure', accent:'#f2ead8',
     x:'57.8%', y:'31.6%', w:'8.8vw', z:3, status:'live',
     summary:'A portfolio you talk to — with a hyperspace warp.', tech:['HTML/CSS/JS','Canvas','Particles','Video'],
     description:`Third-generation interactive portfolio prototype: a particle-face hero with an "Ask Nemi everything" chat, theme toggle, and an About page that opens through a hyperspace warp transition into a living data-stream dimension telling the project's story from Nehemiah's POV.`,
     stats:{pwr:70,spd:85,def:58}, links:{live:'',code:''} },
-  { id:'08', unit:'SILVER', name:'Web CV — Personal Resume RAG Chatbot', type:'GenAI / RAG — In Development', class:'Mirror', accent:'#c9ced6',
-    x:'66.0%', y:'35.9%', w:'7.5vw', z:1, status:'coming_soon',
-    summary:'A portfolio that answers back — RAG over everything Nehemiah.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
-    description:`Next-generation personal site where a RAG chatbot is the core: Gemini LLM + embeddings over a curated markdown knowledge base (Supabase pgvector), serving cited, hallucination-gated answers about projects, skills, and journey. Currently in active development.`,
-    stats:{pwr:92,spd:60,def:70}, links:{} },
-  { id:'09', unit:'MAGENTA', name:'ARMORY HALL', type:'Creative Web / You Are Here', class:'Chaos', accent:'#d8419b',
-    x:'82.6%', y:'33.3%', w:'9.9vw', z:7, status:'coming_soon',
-    summary:'The hall you are standing in right now.', tech:['Canvas','Frame-Scrub','Vanilla JS','Whisk AI'],
-    description:`This very site: a cinematic two-act portfolio where a dark hall powers on as you scroll and its units step out to present each project. AI-generated visuals, canvas frame-scrubbing, and a character-select arsenal. Under construction — you're watching it being built.`,
-    stats:{pwr:80,spd:65,def:62}, links:{} },
-  { id:'10', unit:'PRIME', name:'Phone Addiction Predictor v2', type:'ML Engineering / Production — Flagship', class:'Prime', accent:'#ff7a1a',
+  { id:'08', unit:'AUGUR', name:'Phone Addiction Predictor v2', type:'ML Engineering / Production — Flagship', class:'Prime', accent:'#ff7a1a',
     x:'94%', y:'8%', w:'11.5vw', z:9, status:'live',
     summary:'The flagship: one preprocessing core, zero skew, deployed.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
     description:`Production-ready rewrite of a smartphone-addiction-level regressor (CatBoost, scale 1–10). One shared Preprocessor class is the single source of truth for training, the FastAPI service, and the Streamlit demo — eliminating training/serving skew by design. Ships with SHAP explanations, tests, CI, Docker, and a live HuggingFace Space deployment. Honest model card included: the suspiciously high R² (~0.95) is flagged as a synthetic-data artifact, not clinical validity.`,
     stats:{pwr:88,spd:75,def:92}, links:{live:'',code:'https://github.com/ne-he/Addictv2'} },
+  { id:'09', unit:'MNEMONIC', name:'Web CV — Personal Resume RAG Chatbot', type:'GenAI / RAG — In Development', class:'Mirror', accent:'#c9ced6',
+    x:'66.0%', y:'35.9%', w:'7.5vw', z:1, status:'coming_soon',
+    summary:'A portfolio that answers back — RAG over everything Nehemiah.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
+    description:`Next-generation personal site where a RAG chatbot is the core: Gemini LLM + embeddings over a curated markdown knowledge base (Supabase pgvector), serving cited, hallucination-gated answers about projects, skills, and journey. Currently in active development.`,
+    stats:{pwr:92,spd:60,def:70}, links:{} },
+  { id:'10', unit:'AEGIS', name:'ARMORY HALL', type:'Creative Web / You Are Here', class:'Chaos', accent:'#d8419b',
+    x:'82.6%', y:'33.3%', w:'9.9vw', z:7, status:'coming_soon',
+    summary:'The hall you are standing in right now.', tech:['Canvas','Frame-Scrub','Vanilla JS','Whisk AI'],
+    description:`This very site: a cinematic two-act portfolio where a dark hall powers on as you scroll and its units step out to present each project. AI-generated visuals, canvas frame-scrubbing, and a character-select arsenal. Under construction — you're watching it being built.`,
+    stats:{pwr:80,spd:65,def:62}, links:{} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
    to any project above — it renders in the panel preview slot automatically. */
 ].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
