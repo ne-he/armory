@@ -13,47 +13,63 @@ document.documentElement.style.setProperty('--mech', MECH_SVG);
    hero robots dead-centre, so the 10 units line up as a STRAIGHT front rank (uniform size
    & height, evenly spaced) standing in front of that trio. Fine-tune live with ?calibrate. */
 const ROBOT_IMG = 'generated/robot2_clear.png';
+/* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
+   Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
+   z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
+   ones receding into the hall. All share the placeholder PNG until the unique
+   robot-XX.png renders exist. The empty 11th json filler ("CLASSIFIED") is dropped;
+   PRIME (flagship) takes slot 10. */
 const PROJECTS = [
-  { id:'01', name:'PULSE',   type:'Realtime Engine',  accent:'#f4a93a', x:'6%',    y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Live event heartbeat.', tech:['WebSocket','Redis','Go'],
-    description:'A realtime presence + signaling layer that keeps thousands of clients in sync with sub-100ms latency. Built for live ops dashboards where every second counts.',
-    stats:{Creativity:72,Technical:94,Impact:80}, links:{live:'#',code:'#'} },
-  { id:'02', name:'WARDEN',  type:'Security Suite',    accent:'#ffb454', x:'15.8%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Threat perimeter.', tech:['Rust','eBPF','Zero-Trust'],
-    description:'An adaptive policy engine that watches the perimeter and quarantines anomalies before they spread. Designed around zero-trust primitives.',
-    stats:{Creativity:64,Technical:90,Impact:88}, links:{live:'#',code:'#'} },
-  { id:'03', name:'ORACLE',  type:'Forecast Model',    accent:'#ffc56b', x:'25.6%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Predictive insight.', tech:['Python','PyTorch','Airflow'],
-    description:'A probabilistic forecasting pipeline turning noisy signals into clear horizons. Ships calibrated confidence bands, not just point guesses.',
-    stats:{Creativity:80,Technical:86,Impact:84}, links:{live:'#',code:'#'} },
-  { id:'04', name:'ATLAS',   type:'Infra Platform',    accent:'#ffd9a0', x:'35.3%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Carries the world.', tech:['K8s','Terraform','Go'],
-    description:'The backbone platform every other unit deploys onto — self-healing infra with one-command provisioning and ruthless cost guardrails.',
-    stats:{Creativity:68,Technical:96,Impact:92}, links:{live:'#',code:'#'} },
-  { id:'05', name:'NOVA',    type:'Design System',     accent:'#ffc56b', x:'45.1%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'A new star of UI.', tech:['React','Tokens','Figma'],
-    description:'A token-driven design system with zero-runtime theming. One source of truth across web, mobile, and embedded surfaces.',
-    stats:{Creativity:92,Technical:78,Impact:82}, links:{live:'#',code:'#'} },
-  { id:'06', name:'RAVEN',   type:'Data Pipeline',     accent:'#ffb454', x:'54.9%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Sees everything.', tech:['Kafka','Spark','dbt'],
-    description:'A streaming ETL fabric that ingests, cleans, and serves petabyte-scale data with lineage tracked end to end.',
-    stats:{Creativity:60,Technical:92,Impact:79}, links:{live:'#',code:'#'} },
-  { id:'07', name:'EMBER',   type:'Creative Tool',     accent:'#f4a93a', x:'64.7%', y:'8%', w:'11.5vw', z:4, status:'active',
-    summary:'Sparks ideas.', tech:['WebGL','Canvas','TS'],
-    description:'A generative art toolkit for live performances — shader graphs you can patch in real time with a MIDI controller.',
-    stats:{Creativity:96,Technical:74,Impact:70}, links:{live:'#',code:'#'} },
-  { id:'08', name:'TITAN',   type:'Game Engine',       accent:'#ffd9a0', x:'74.4%', y:'8%', w:'11.5vw', z:4, status:'coming_soon',
-    summary:'Classified build.', tech:['C++','Vulkan'],
-    description:'A from-scratch ECS game engine. Currently sealed in the vault — declassified soon.',
-    stats:{Creativity:88,Technical:90,Impact:0}, links:{} },
-  { id:'09', name:'HALO',    type:'AR Interface',      accent:'#ffc56b', x:'84.2%', y:'8%', w:'11.5vw', z:4, status:'coming_soon',
-    summary:'Classified build.', tech:['ARKit','Swift'],
-    description:'Spatial UI experiments for heads-up workflows. Field trials underway.',
-    stats:{Creativity:90,Technical:80,Impact:0}, links:{} },
-  { id:'10', name:'SPECTER', type:'Stealth Ops',       accent:'#ffb454', x:'94%',   y:'8%', w:'11.5vw', z:4, status:'coming_soon',
-    summary:'Classified build.', tech:['Tor','Crypto'],
-    description:'A privacy-first comms layer. Details remain dark until launch.',
-    stats:{Creativity:84,Technical:88,Impact:0}, links:{} },
+  { id:'01', unit:'CRIMSON', name:'Trash Classifier — CNN Benchmark', type:'Computer Vision / Deep Learning', class:'Striker', accent:'#e0312e',
+    x:'8.7%', y:'29.1%', w:'13.5vw', z:10, status:'live',
+    summary:'Three CNN architectures battle over 6 waste classes.', tech:['PyTorch','ResNet50','EfficientNet','MobileNetV2','Grad-CAM'],
+    description:`Multi-architecture benchmark on TrashNet (6 classes, 2,527 images) comparing ResNet50, EfficientNet-B0, and MobileNetV2 with selective fine-tuning, then fusing them in a soft-voting ensemble. Class imbalance is tamed with WeightedRandomSampler + label smoothing, and Grad-CAM heatmaps explain every prediction.`,
+    stats:{pwr:86,spd:72,def:80}, links:{live:'',code:''} },
+  { id:'02', unit:'AZURE', name:'Feature Store MVP', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
+    x:'18.2%', y:'30.8%', w:'11.5vw', z:8, status:'live',
+    summary:'Production-grade feature store, end to end.', tech:['Python','PostgreSQL','Redis','FastAPI','Streamlit','Evidently','Docker'],
+    description:`E-commerce feature store that ingests transaction data, computes 20+ user-level features in batch, stores them in PostgreSQL (offline) + Redis (online), and serves them through a low-latency FastAPI. A Streamlit dashboard with Evidently watches freshness and drift. All four milestones (ingestion → monitoring) shipped.`,
+    stats:{pwr:90,spd:70,def:85}, links:{live:'',code:''} },
+  { id:'03', unit:'GOLD', name:'Waste Detection — CNN & Grad-CAM', type:'Deep Learning / Explainable AI', class:'Luminary', accent:'#e0a93a',
+    x:'26.8%', y:'32.3%', w:'9.5vw', z:6, status:'live',
+    summary:'Notebook to production: 90.3% accuracy, explained.', tech:['TensorFlow/Keras','MobileNetV2','Grad-CAM','FastAPI','PyTest'],
+    description:`Waste image classification on TrashNet refactored from a Jupyter notebook into a modular, config-driven, tested Python project. MobileNetV2 transfer learning hits 90.3% validation accuracy (baseline CNN: 54.5%), Grad-CAM highlights what the model actually looks at, and a FastAPI service + CLI make it usable beyond the notebook.`,
+    stats:{pwr:84,spd:78,def:86}, links:{live:'',code:''} },
+  { id:'04', unit:'VIOLET', name:'SimpleNotes — SwiftUI', type:'Mobile / iOS', class:'Phantom', accent:'#8b4fd8',
+    x:'34.8%', y:'32.6%', w:'9.1vw', z:5, status:'live',
+    summary:'A featherweight iOS notes app, zero friction.', tech:['Swift','SwiftUI','iOS 16','UserDefaults'],
+    description:`Native SwiftUI notes app for iOS 16+: create, edit, and categorize notes (personal/work/other with distinct colors), full-text search across title and body, swipe-to-share, bulk delete with confirmation, automatic UserDefaults persistence, and an animated splash screen.`,
+    stats:{pwr:55,spd:90,def:60}, links:{live:'',code:''} },
+  { id:'05', unit:'EMERALD', name:'HCI Lab — Final Web Project', type:'Full-stack Web / Coursework', class:'Sage', accent:'#2fae6b',
+    x:'42.6%', y:'32.8%', w:'8.3vw', z:2, status:'live',
+    summary:'Type-safe monorepo; the API contract is the source of truth.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI','pnpm'],
+    description:`Human-Computer Interaction lab final built as a TypeScript monorepo: Express 5 API with PostgreSQL + Drizzle ORM, Zod validation everywhere, and Orval generating API hooks + schemas straight from the OpenAPI spec — so frontend and backend can never drift apart.`,
+    stats:{pwr:78,spd:74,def:76}, links:{live:'',code:''} },
+  { id:'06', unit:'ORANGE', name:'To-Do List Organizer', type:'Productivity Web App', class:'Forge', accent:'#e8742c',
+    x:'50.2%', y:'31.6%', w:'8.8vw', z:4, status:'live',
+    summary:'One dashboard for the whole day.', tech:['HTML/CSS/JS','Kiro AI'],
+    description:`A clean productivity dashboard combining a live clock with greeting, a focus timer, a to-do list, and quick links in one interface. Built as a Software Engineering mini project with an AI-assisted (Kiro) workflow — fast to ship, simple to use.`,
+    stats:{pwr:50,spd:95,def:55}, links:{live:'',code:''} },
+  { id:'07', unit:'WHITE', name:'Ask Nemi — Interactive Portfolio v3', type:'Creative Web / Interactive', class:'Pure', accent:'#f2ead8',
+    x:'57.8%', y:'31.6%', w:'8.8vw', z:3, status:'live',
+    summary:'A portfolio you talk to — with a hyperspace warp.', tech:['HTML/CSS/JS','Canvas','Particles','Video'],
+    description:`Third-generation interactive portfolio prototype: a particle-face hero with an "Ask Nemi everything" chat, theme toggle, and an About page that opens through a hyperspace warp transition into a living data-stream dimension telling the project's story from Nehemiah's POV.`,
+    stats:{pwr:70,spd:85,def:58}, links:{live:'',code:''} },
+  { id:'08', unit:'SILVER', name:'Web CV — Personal Resume RAG Chatbot', type:'GenAI / RAG — In Development', class:'Mirror', accent:'#c9ced6',
+    x:'66.0%', y:'35.9%', w:'7.5vw', z:1, status:'coming_soon',
+    summary:'A portfolio that answers back — RAG over everything Nehemiah.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
+    description:`Next-generation personal site where a RAG chatbot is the core: Gemini LLM + embeddings over a curated markdown knowledge base (Supabase pgvector), serving cited, hallucination-gated answers about projects, skills, and journey. Currently in active development.`,
+    stats:{pwr:92,spd:60,def:70}, links:{} },
+  { id:'09', unit:'MAGENTA', name:'ARMORY HALL', type:'Creative Web / You Are Here', class:'Chaos', accent:'#d8419b',
+    x:'82.6%', y:'33.3%', w:'9.9vw', z:7, status:'coming_soon',
+    summary:'The hall you are standing in right now.', tech:['Canvas','Frame-Scrub','Vanilla JS','Whisk AI'],
+    description:`This very site: a cinematic two-act portfolio where a dark hall powers on as you scroll and its units step out to present each project. AI-generated visuals, canvas frame-scrubbing, and a character-select arsenal. Under construction — you're watching it being built.`,
+    stats:{pwr:80,spd:65,def:62}, links:{} },
+  { id:'10', unit:'PRIME', name:'Phone Addiction Predictor v2', type:'ML Engineering / Production — Flagship', class:'Prime', accent:'#ff7a1a',
+    x:'94%', y:'8%', w:'11.5vw', z:9, status:'live',
+    summary:'The flagship: one preprocessing core, zero skew, deployed.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
+    description:`Production-ready rewrite of a smartphone-addiction-level regressor (CatBoost, scale 1–10). One shared Preprocessor class is the single source of truth for training, the FastAPI service, and the Streamlit demo — eliminating training/serving skew by design. Ships with SHAP explanations, tests, CI, Docker, and a live HuggingFace Space deployment. Honest model card included: the suspiciously high R² (~0.95) is flagged as a synthetic-data artifact, not clinical validity.`,
+    stats:{pwr:88,spd:75,def:92}, links:{live:'',code:'https://github.com/ne-he/Addictv2'} },
 ].map(p => ({ ...p, image: ROBOT_IMG }));
 
 /* ---- render robots ---- */
@@ -67,7 +83,7 @@ PROJECTS.forEach(p=>{
   r.dataset.id = p.id;
   r.style.cssText = `--x:${p.x};--y:${p.y};--w:${p.w};--z:${p.z};--glow:${p.accent}`;
   r.innerHTML = `
-    <div class="robot-tooltip"><b>${p.name}</b><span>${p.type}</span><i></i></div>
+    <div class="robot-tooltip"><b>${p.name}</b><span>${p.unit} · ${p.class}</span><i></i></div>
     <div class="robot-figure">
       <div class="robot-body" ${p.image?`style="background-image:url('${p.image}');background-size:contain;background-repeat:no-repeat;background-position:center"`:''}></div>
       <div class="robot-eyes"><i></i><i></i></div>
@@ -106,7 +122,7 @@ function openPanel(id){
   panel.style.setProperty('--glow', p.accent);
   panel.querySelector('.panel-type').textContent = p.type;
   panel.querySelector('.panel-name').textContent = p.name;
-  panel.querySelector('.panel-desig').textContent = `MODEL DESIGNATION — UNIT ${p.id}`;
+  panel.querySelector('.panel-desig').textContent = `${p.unit} · ${(p.class||'').toUpperCase()} CLASS`;
   panel.querySelector('.panel-status').innerHTML = p.status==='coming_soon'
     ? '◇ STATUS — CLASSIFIED' : '● STATUS — DEPLOYED';
   panel.querySelector('.panel-brief').textContent = p.description;
@@ -125,7 +141,7 @@ function openPanel(id){
   /* links */
   const L=[]; if(p.links.live) L.push(`<a class="btn-link" href="${p.links.live}" target="_blank" rel="noopener">View Live ↗</a>`);
   if(p.links.code) L.push(`<a class="btn-link ghost" href="${p.links.code}" target="_blank" rel="noopener">Source ↗</a>`);
-  panel.querySelector('.panel-links').innerHTML = L.join('') || '<span class="btn-link ghost" style="pointer-events:none">Declassified Soon</span>';
+  panel.querySelector('.panel-links').innerHTML = L.join('') || `<span class="btn-link ghost" style="pointer-events:none">${p.status==='coming_soon'?'Declassified Soon':'Links Coming Soon'}</span>`;
   scrim.classList.add('is-open'); panel.classList.add('is-open');
   requestAnimationFrame(()=>setTimeout(()=>panel.querySelectorAll('.stat-bar i').forEach(b=>b.style.width=b.dataset.v),120));
 }
@@ -218,62 +234,104 @@ function startCanvas(){
   window.addEventListener('resize', resizeCanvas);
 }
 
-/* ---------- shared scrub application ---------- */
+/* ---------- Page-1 → Page-2 state (one-way) ---------- */
+let committed = false, inArsenal = false, scrubActive = false, beatTimers = [];
+const COMMIT_AT = 0.965;                        // scroll this far → lock into Page 2 (no scroll-back)
+const TR_SWAP = 520, TR_END = 1340;             // loading-beat timing: cover swaps content / cover lifts
+
+function revealRobots(){
+  [...arsenalEl.querySelectorAll('.robot')].forEach((r,i)=>{
+    r.style.transitionDelay = (i*0.07)+'s'; r.classList.add('on');   // staggered PNG fade-in
+  });
+}
+function clearRobots(){
+  arsenalEl.querySelectorAll('.robot').forEach(r=>{ r.style.transitionDelay='0s'; r.classList.remove('on'); });
+}
+
+/* ---------- transition flavor text (V3 "DEPLOYING UNITS" beat — cycles, not a static spinner) ---------- */
+const trLabel = document.querySelector('.tr-label');
+let trTimer = null;
+function cycleTransition(phrases){
+  if(!trLabel) return;
+  let i = 0; trLabel.textContent = phrases[0];
+  clearInterval(trTimer);
+  trTimer = setInterval(()=>{ i = (i+1)%phrases.length; trLabel.textContent = phrases[i]; }, 430);
+}
+function stopTransitionText(){ clearInterval(trTimer); trTimer = null; }
+
+/* ---------- shared scrub application (Page 1) ---------- */
 function applyScrub(p){
+  if(committed) return;                         // Page 2 is locked — ignore any stray scroll
   currentP = p;
   drawFrameAt(p);
-  const ph = p>0.62?3 : p>0.22?2 : 1;        // atmosphere phase (beam/scan/vignette CSS)
+  const ph = p>0.62?3 : p>0.22?2 : 1;           // atmosphere phase (beam/scan/vignette CSS)
   stage.dataset.phase = ph;
   dots.forEach((d,i)=>d.classList.toggle('on', i===ph-1));
-  if(p>0.86) enterArsenal(); else if(p<0.80) exitArsenal();   // gate with hysteresis
+  if(p>=COMMIT_AT) commitToArsenal();           // reached the end → cross over into Page 2
 }
 
-/* ---------- cinematic beat + Page-2 reveal ---------- */
-let inArsenal = false, beatTimers = [];
-function enterArsenal(){
-  if(inArsenal) return; inArsenal = true;
+/* ---------- scroll to the end → loading beat → LOCK into the lit Arsenal ---------- */
+function commitToArsenal(){
+  if(committed) return; committed = true; inArsenal = true; scrubActive = false;
   beatTimers.forEach(clearTimeout); beatTimers = [];
-  stage.classList.add('is-flash');                       // bloom flash + SYSTEM ONLINE
-  if(idleV && idleV.play) idleV.play().catch(()=>{});
+  drawFrameAt(1);                               // hold the lit empty hall behind the cover
+  document.body.classList.add('is-transition'); // dark loading cover fades in
+  cycleTransition(['DEPLOYING UNITS','CALIBRATING ARSENAL','SPINNING UP CORES','UNITS ONLINE']);
   beatTimers.push(setTimeout(()=>{
-    stage.classList.add('is-arsenal');                   // idle video + title + nav fade in
-    [...arsenalEl.querySelectorAll('.robot')].forEach((r,i)=>{
-      r.style.transitionDelay = (i*0.07)+'s'; r.classList.add('on');   // staggered PNG fade-in
-    });
-  }, 560));
-  beatTimers.push(setTimeout(()=>{ stage.classList.remove('is-flash'); }, 1450));
-}
-function exitArsenal(){
-  if(!inArsenal) return; inArsenal = false;
-  beatTimers.forEach(clearTimeout); beatTimers = [];
-  stage.classList.remove('is-arsenal','is-flash');
-  arsenalEl.querySelectorAll('.robot').forEach(r=>{ r.style.transitionDelay='0s'; r.classList.remove('on'); });
-  if(idleV && idleV.pause) idleV.pause();
+    document.body.classList.remove('is-scrubbing');
+    document.body.classList.add('is-locked');   // kill scroll + pin the stage to the viewport
+    window.scrollTo(0,0);
+    stage.dataset.phase = 3;
+    stage.classList.add('is-arsenal');          // idle video + title + nav + power-down button
+    if(idleV && idleV.play) idleV.play().catch(()=>{});
+    revealRobots();
+  }, TR_SWAP));
+  beatTimers.push(setTimeout(()=>{ document.body.classList.remove('is-transition'); stopTransitionText(); }, TR_END));
 }
 
-/* ---------- scroll engine: GSAP pin scrub, or manual sticky fallback ---------- */
+/* ---------- power-down button → loading beat → back to the dark, un-lit hall ---------- */
+function returnHome(){
+  if(!committed) return;
+  beatTimers.forEach(clearTimeout); beatTimers = [];
+  document.body.classList.add('is-transition'); // cover the swap back
+  cycleTransition(['POWERING DOWN','SUITS TO STANDBY','HALL DARK']);
+  beatTimers.push(setTimeout(()=>{
+    stage.classList.remove('is-arsenal','is-flash');
+    clearRobots();
+    if(idleV){ try{ idleV.pause(); idleV.currentTime = 0; }catch(_){} }
+    document.body.classList.remove('is-locked');
+    document.body.classList.add('is-scrubbing'); // restore the tall scrub track
+    committed = false; inArsenal = false;
+    currentP = 0; lastIdx = -1;
+    stage.dataset.phase = 1;
+    dots.forEach((d,i)=>d.classList.toggle('on', i===0));
+    window.scrollTo(0,0);
+    scrubActive = true;
+    drawFrameAt(0);                             // back to the dark first frame
+  }, TR_SWAP));
+  beatTimers.push(setTimeout(()=>{ document.body.classList.remove('is-transition'); stopTransitionText(); }, TR_END));
+}
+
+/* ---------- scroll engine: manual sticky driver (full control for the one-way flow) ---------- */
+function onScrollDrive(){
+  if(!scrubActive || committed) return;
+  const total = track.offsetHeight - window.innerHeight;
+  const p = total>0 ? Math.min(1,Math.max(0,-track.getBoundingClientRect().top/total)) : 0;
+  applyScrub(p);
+}
+window.addEventListener('scroll', onScrollDrive, {passive:true});
+window.addEventListener('resize', onScrollDrive);
+
 function initScroll(){
-  if(window.gsap && window.ScrollTrigger){
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.create({
-      trigger:'.stage', start:'top top', end:'+=2400', pin:true, scrub:0.5,
-      onUpdate:s=>applyScrub(s.progress)
-    });
-    ScrollTrigger.refresh();
-  } else {
-    stage.style.position='sticky'; stage.style.top='0';
-    track.style.height='340vh';
-    const read = () => { const total = track.offsetHeight - window.innerHeight;
-      applyScrub(total>0 ? Math.min(1,Math.max(0,-track.getBoundingClientRect().top/total)) : 0); };
-    window.addEventListener('scroll', read, {passive:true});
-    window.addEventListener('resize', read);
-    read();
-  }
-  applyScrub(currentP);
+  document.body.classList.add('is-scrubbing');  // CSS gives the track its 340vh of scroll room
+  scrubActive = true;
+  window.scrollTo(0,0);
+  applyScrub(0);
 }
 
 /* ---------- boot ---------- */
 if(reduceMotion || calibrating){
+  if(calibrating) document.body.classList.add('is-calibrate');
   loadSingleFrame(FRAME_LAST);               // static lit empty hall (Page-2 reference)
 } else {
   startCanvas();                             // preload newgif → scrub on canvas
@@ -307,13 +365,23 @@ function closeLoader(){
   loader.classList.add('is-done');
   document.body.classList.remove('is-loading');
   if(calibrating){
-    drawFrameAt(1); stage.classList.add('is-arsenal');
+    drawFrameAt(1); stage.dataset.phase=3; stage.classList.add('is-arsenal');
     arsenalEl.querySelectorAll('.robot').forEach(r=>r.classList.add('on'));
   } else if(reduceMotion){
-    drawFrameAt(1); enterArsenal();          // skip the scrub, jump to the lit arsenal
+    drawFrameAt(1); stage.dataset.phase=3;
+    document.body.classList.add('is-locked');     // static lit arsenal, no scroll
+    stage.classList.add('is-arsenal'); committed=true; inArsenal=true;
+    if(idleV && idleV.play) idleV.play().catch(()=>{});
+    revealRobots();
   } else {
-    initScroll();                            // start the pinned video/canvas scrub
+    initScroll();                                 // start the manual Page-1 scrub
   }
+}
+/* power-down button (Page 2 → dark hall); hidden where there's no scrub to return to */
+const homeBtn = document.querySelector('.home-btn');
+if(homeBtn){
+  if(reduceMotion || calibrating) homeBtn.style.display='none';
+  else homeBtn.addEventListener('click', returnHome);
 }
 const li = setInterval(()=>{
   // ease the shown bar toward the real load %, but always creep so it never stalls visually
@@ -357,30 +425,32 @@ if(calibrating){
   /* swallow clicks during calibrate (capture phase) so dragging never opens the dossier panel */
   arsenal.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); }, true);
 
+  /* window-level drag — robust: no setPointerCapture quirks, keeps tracking even if the
+     cursor briefly leaves the robot box mid-drag. pointerdown arms it, window move/up drive it. */
   let active=null, sx=0, sy=0, ox=0, oy=0;
   arsenal.querySelectorAll('.robot').forEach(r=>{
     r.style.cursor='grab';
     r.addEventListener('pointerdown', e=>{
-      active=r; r.setPointerCapture(e.pointerId);
+      active=r; r.style.cursor='grabbing'; r.style.zIndex='999';
       sx=e.clientX; sy=e.clientY;
-      ox=parseFloat(getComputedStyle(r).getPropertyValue('--x'));
-      oy=parseFloat(getComputedStyle(r).getPropertyValue('--y'));
-      e.preventDefault();
+      ox=parseFloat(getComputedStyle(r).getPropertyValue('--x'))||0;
+      oy=parseFloat(getComputedStyle(r).getPropertyValue('--y'))||0;
+      e.preventDefault(); e.stopPropagation();
     });
-    r.addEventListener('pointermove', e=>{
-      if(active!==r) return;
-      const nx = ox + (e.clientX-sx)/window.innerWidth*100;
-      const ny = oy - (e.clientY-sy)/window.innerHeight*100;   // bottom-anchored
-      r.style.setProperty('--x', nx.toFixed(1)+'%');
-      r.style.setProperty('--y', ny.toFixed(1)+'%');
-    });
-    r.addEventListener('pointerup', ()=>{ active=null; });
     r.addEventListener('wheel', e=>{
       e.preventDefault();
-      const cur=parseFloat(getComputedStyle(r).getPropertyValue('--w'));
+      const cur=parseFloat(getComputedStyle(r).getPropertyValue('--w'))||11.5;
       r.style.setProperty('--w', Math.max(4,(cur - Math.sign(e.deltaY)*0.4)).toFixed(1)+'vw');
     }, {passive:false});
   });
+  window.addEventListener('pointermove', e=>{
+    if(!active) return;
+    const nx = ox + (e.clientX-sx)/window.innerWidth*100;
+    const ny = oy - (e.clientY-sy)/window.innerHeight*100;     // bottom-anchored
+    active.style.setProperty('--x', nx.toFixed(1)+'%');
+    active.style.setProperty('--y', ny.toFixed(1)+'%');
+  });
+  window.addEventListener('pointerup', ()=>{ if(active){ active.style.cursor='grab'; active=null; } });
   addEventListener('keydown', e=>{
     if(e.key.toLowerCase()!=='c') return;
     const dump = [...arsenal.querySelectorAll('.robot')].map(r=>{
