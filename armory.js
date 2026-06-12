@@ -13,6 +13,26 @@ document.documentElement.style.setProperty('--mech', MECH_SVG);
    hero robots dead-centre, so the 10 units line up as a STRAIGHT front rank (uniform size
    & height, evenly spaced) standing in front of that trio. Fine-tune live with ?calibrate. */
 const ROBOT_IMG = 'generated/robot2_clear.png';
+
+/* Language composition per unit (real languages; percentages are seeded-random
+   placeholders — swap with real numbers later in LANGS_BY_ID/makeLangs). */
+const LANGS_BY_ID = {
+  '01':['Python','Jupyter'], '02':['Python','SQL','Docker'], '03':['Python','Shell'],
+  '04':['Swift'], '05':['TypeScript','SQL','CSS'], '06':['JavaScript','HTML','CSS'],
+  '07':['JavaScript','HTML','CSS'], '08':['TypeScript','JavaScript','CSS'],
+  '09':['JavaScript','CSS','HTML'], '10':['Python','Shell','Docker'],
+};
+function makeLangs(id){
+  const names = LANGS_BY_ID[id] || ['Python'];
+  let seed = parseInt(id,10)*13+7;
+  const rnd = ()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
+  const w = names.map(()=>0.35+rnd());
+  const sum = w.reduce((a,b)=>a+b,0);
+  const pct = w.map(x=>Math.round(x/sum*100));
+  pct[0] += 100 - pct.reduce((a,b)=>a+b,0);          // normalize to exactly 100
+  return names.map((name,i)=>({name,pct:pct[i]})).sort((a,b)=>b.pct-a.pct);
+}
+
 /* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
@@ -70,7 +90,9 @@ const PROJECTS = [
     summary:'The flagship: one preprocessing core, zero skew, deployed.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
     description:`Production-ready rewrite of a smartphone-addiction-level regressor (CatBoost, scale 1–10). One shared Preprocessor class is the single source of truth for training, the FastAPI service, and the Streamlit demo — eliminating training/serving skew by design. Ships with SHAP explanations, tests, CI, Docker, and a live HuggingFace Space deployment. Honest model card included: the suspiciously high R² (~0.95) is flagged as a synthetic-data artifact, not clinical validity.`,
     stats:{pwr:88,spd:75,def:92}, links:{live:'',code:'https://github.com/ne-he/Addictv2'} },
-].map(p => ({ ...p, image: ROBOT_IMG }));
+/* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
+   to any project above — it renders in the panel preview slot automatically. */
+].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
 
 /* ---- render robots ---- */
 const arsenal = document.querySelector('.arsenal');
@@ -130,18 +152,18 @@ function openPanel(id){
   panel.querySelector('.panel-status').innerHTML = p.status==='coming_soon'
     ? '◇ STATUS — CLASSIFIED' : '● STATUS — DEPLOYED';
   panel.querySelector('.panel-brief').textContent = p.description;
-  panel.querySelector('.pi-fig').style.setProperty('--glow', p.accent);
-  if(p.image){ const fig=panel.querySelector('.pi-fig');
-    fig.style.background=`url('${p.image}') bottom center/contain no-repeat`;
-    fig.style.webkitMask='none'; fig.style.mask='none';     // show the real PNG, not the mech silhouette
-  }
+  /* project-page preview slot (set p.preview to a screenshot URL to fill it) */
+  const shot = panel.querySelector('.pi-shot');
+  const ph   = panel.querySelector('.pi-placeholder');
+  if(p.preview){ shot.src=p.preview; shot.style.display='block'; if(ph) ph.style.display='none'; }
+  else { shot.removeAttribute('src'); shot.style.display='none'; if(ph) ph.style.display='flex'; }
   /* chips */
   panel.querySelector('.chips').innerHTML = p.tech.map(t=>`<span class="chip">${t}</span>`).join('');
-  /* stats */
-  panel.querySelector('.stats').innerHTML = Object.entries(p.stats).map(([k,v])=>`
-    <div class="stat"><span class="stat-k">${k}</span>
-    <span class="stat-bar"><i style="--v:0%" data-v="${v}%"></i></span>
-    <span class="stat-v">${v?String(v).padStart(2,'0'):'--'}</span></div>`).join('');
+  /* languages (percentages = placeholder until real numbers go into LANGS_BY_ID) */
+  panel.querySelector('.stats').innerHTML = (p.langs||[]).map(l=>`
+    <div class="stat"><span class="stat-k">${l.name}</span>
+    <span class="stat-bar"><i style="--v:0%" data-v="${l.pct}%"></i></span>
+    <span class="stat-v">${l.pct}%</span></div>`).join('');
   /* links */
   const L=[]; if(p.links.live) L.push(`<a class="btn-link" href="${p.links.live}" target="_blank" rel="noopener">View Live ↗</a>`);
   if(p.links.code) L.push(`<a class="btn-link ghost" href="${p.links.code}" target="_blank" rel="noopener">Source ↗</a>`);
@@ -185,8 +207,12 @@ stageEl.appendChild(rosterTicksEl);
 
 function renderRoster(idx){
   const total = PROJECTS.length;
+  /* role by offset so off-screen units park on the CORRECT side (no gray ghost
+     sliding through center): exiting-left → far-pre (parks left), etc. */
   arsenalEl.querySelectorAll('.robot').forEach((r,i)=>{
-    r.dataset.rosterRole = i===idx?'ctr' : i===idx-1?'pre' : i===idx+1?'nxt' : '';
+    const off = i - idx;
+    r.dataset.rosterRole = off===0?'ctr' : off===-1?'pre' : off===1?'nxt'
+                         : off<0?'far-pre':'far-nxt';
   });
   const p = PROJECTS[idx];
   const rlc = rosterLabelEl.querySelector('.rl-counter');

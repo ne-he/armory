@@ -327,12 +327,15 @@ body:not(.is-calibrate) .stage.is-arsenal .arsenal .robot:hover {
   filter:none; transform:translateX(-50%); z-index:auto;
 }
 
-/* All robots: hidden by default, override arc --x/--y/--w positioning */
+/* All robots: hidden by default (feet on a SHARED floor line so every slot lines
+   up), override arc --x/--y/--w positioning. Only width changes per role so the
+   bigger center grows UPWARD from the same floor. */
 body:not(.is-calibrate) .stage.is-arsenal .robot {
   left:50%;
-  bottom:18%;
-  width:clamp(130px,20vh,240px);
+  bottom:13%;
+  width:clamp(120px,18vh,210px);
   transform:translateX(-50%);
+  transform-origin:50% 100%;          /* scale/grow from the feet */
   opacity:0;
   pointer-events:none;
   z-index:5;
@@ -344,9 +347,9 @@ body:not(.is-calibrate) .stage.is-arsenal .robot {
     transform .55s var(--ease);
 }
 
-/* CENTER — powered on */
+/* CENTER — powered on, BIG (grows up from the floor, clears the title) */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
-  width:clamp(150px,22vh,260px);
+  width:clamp(180px,30vh,380px);
   opacity:1;
   pointer-events:auto;
   filter:none;
@@ -368,34 +371,46 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"].is-lock
   cursor:default;
 }
 
-/* LEFT PREVIEW */
-body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] {
-  left:22%;
-  width:clamp(75px,12vh,138px);
-  opacity:.68;
-  pointer-events:auto;
-  cursor:pointer;
-  filter:brightness(.38) saturate(.22) blur(1.5px);
-  z-index:5;
-  transform:translateX(-50%) scale(.95);
-}
-
-/* RIGHT PREVIEW */
+/* SIDE PREVIEWS (pre/nxt) — POWERED OFF: near-black silhouettes, no glow at rest */
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"],
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
-  left:78%;
-  width:clamp(75px,12vh,138px);
-  opacity:.68;
+  width:clamp(85px,14vh,160px);
+  opacity:.62;
   pointer-events:auto;
   cursor:pointer;
-  filter:brightness(.38) saturate(.22) blur(1.5px);
-  z-index:5;
-  transform:translateX(-50%) scale(.95);
+  filter:brightness(.3) grayscale(.92) blur(1.4px);  /* powered OFF: visible silhouette, no glow */
+  z-index:4;
+  transform:translateX(-50%) scale(.96);
+}
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] { left:23%; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:77%; }
+
+/* Kill the warm bloom on the preview body so it can't glow while "off" */
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] .robot-body,
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-body { filter:none; }
+
+/* FAR (off-screen on their own side) — park left/right so nothing sweeps through
+   the center when stepping (fixes the gray ghost). */
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="far-pre"] {
+  left:-12%;
+  width:clamp(70px,11vh,120px);
+  opacity:0;pointer-events:none;z-index:2;
+  filter:brightness(.1) grayscale(1);
+  transform:translateX(-50%) scale(.9);
+}
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="far-nxt"] {
+  left:112%;
+  width:clamp(70px,11vh,120px);
+  opacity:0;pointer-events:none;z-index:2;
+  filter:brightness(.1) grayscale(1);
+  transform:translateX(-50%) scale(.9);
 }
 
-/* Preview hover: slightly less dim */
+/* Preview hover: lift slightly out of the dark (still clearly "secondary") */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"]:hover,
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"]:hover {
-  filter:brightness(.58) saturate(.38);
+  filter:brightness(.34) grayscale(.7) blur(1px);
+  opacity:.7;
 }
 
 /* Previews: no tooltip */
@@ -548,8 +563,11 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* ============================================================
    DOSSIER PANEL
    ============================================================ */
-.panel-scrim{position:fixed;inset:0;z-index:40;background:rgba(4,5,7,.55);
-  backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+/* Scrim: gradient only (NO backdrop blur) so the selected center robot stays sharp
+   on the left while the panel side darkens. */
+.panel-scrim{position:fixed;inset:0;z-index:40;
+  background:linear-gradient(90deg, rgba(4,5,7,.10) 0%, rgba(4,5,7,.42) 52%, rgba(4,5,7,.82) 100%);
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
 .panel-scrim.is-open{opacity:1;pointer-events:auto}
 .panel-host{position:fixed;inset:0;overflow:hidden;z-index:41;pointer-events:none}
 .panel{position:absolute;top:0;right:0;height:100%;width:min(480px,92vw);
@@ -574,9 +592,14 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 .panel-status{font-family:var(--fr-mono);font-size:10px;letter-spacing:.2em;color:var(--amber-soft)}
 .panel-img{margin:0 32px 4px;aspect-ratio:16/10;border:1px solid var(--line-soft);
   background:linear-gradient(135deg,#13161b,#0a0c0f);position:relative;overflow:hidden;margin-top:24px}
-.panel-img .pi-fig{position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:96%;aspect-ratio:140/240;
-  -webkit-mask:var(--mech) center/contain no-repeat;mask:var(--mech) center/contain no-repeat;
-  background:linear-gradient(180deg,#26292e,#0d0e11);filter:drop-shadow(0 0 30px var(--glow))}
+/* project-page screenshot (fills when project.preview is set) */
+.panel-img .pi-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:2}
+/* empty-state placeholder — the slot waiting for a screenshot */
+.panel-img .pi-placeholder{position:absolute;inset:0;z-index:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--fr-mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--muted);text-align:center}
+.panel-img .pi-placeholder span{font-size:8.5px;letter-spacing:.2em;color:var(--muted-2)}
 .panel-img .pi-grid{position:absolute;inset:0;opacity:.4;
   background:linear-gradient(rgba(244,169,58,.06) 1px,transparent 1px) 0 0/100% 28px,
             linear-gradient(90deg,rgba(244,169,58,.06) 1px,transparent 1px) 0 0/28px 100%}
