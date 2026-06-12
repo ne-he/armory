@@ -81,7 +81,7 @@ PROJECTS.forEach(p=>{
   const r = document.createElement('div');
   r.className = 'robot' + (locked ? ' is-locked' : '') + (p.image ? ' has-img' : '');
   r.dataset.id = p.id;
-  r.style.cssText = `--x:${p.x};--y:${p.y};--w:${p.w};--z:${p.z};--glow:${p.accent}`;
+  r.style.cssText = `--x:${p.x};--y:${p.y};--w:${p.w};--z:${p.z}`;
   r.innerHTML = `
     <div class="robot-tooltip"><b>${p.name}</b><span>${p.unit} · ${p.class}</span><i></i></div>
     <div class="robot-figure">
@@ -91,7 +91,7 @@ PROJECTS.forEach(p=>{
       ${locked?'<div class="robot-lock">LOCKED</div>':''}
     </div>
     <div class="robot-shadow"></div>`;
-  if(!locked) r.addEventListener('click', ()=>openPanel(p.id));
+  r.addEventListener('click', ()=>rosterClick(p.id, locked, r));
   arsenal.appendChild(r);
 
   /* unit-nav entry */
@@ -103,11 +103,15 @@ PROJECTS.forEach(p=>{
     <span class="unit-type">${locked?'CLASSIFIED':p.type}</span>`;
   u.addEventListener('mouseenter', ()=>highlight(p.id,true));
   u.addEventListener('mouseleave', ()=>highlight(p.id,false));
-  if(!locked) u.addEventListener('click', ()=>openPanel(p.id));
+  if(!locked) u.addEventListener('click', ()=>{
+    if(inArsenal){ const _i=PROJECTS.indexOf(p); if(_i>=0) stepRosterTo(_i); }
+    else openPanel(p.id);
+  });
   unitRail.appendChild(u);
 });
 
 function highlight(id,on){
+  if(inArsenal) return;
   const r = arsenal.querySelector(`.robot[data-id="${id}"]`);
   const u = unitRail.querySelector(`.unit[data-id="${id}"]`);
   if(u) u.classList.toggle('is-active',on);
@@ -149,6 +153,99 @@ function closePanel(){ scrim.classList.remove('is-open'); panel.classList.remove
 scrim.addEventListener('click', closePanel);
 panel.querySelector('.panel-back').addEventListener('click', closePanel);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+
+/* ============================================================
+   ROSTER STEP-NAV (V4)
+   3-slot: prev (dim) · center (lit) · next (dim)
+   Arrow/keyboard/swipe = one step only. Locked unit = shake deny.
+   ============================================================ */
+let rosterIdx = 0;
+let rosterStepping = false;
+
+/* Inject roster chrome into stage */
+const rosterPrevBtn = document.createElement('button');
+rosterPrevBtn.className = 'roster-arrow is-prev';
+rosterPrevBtn.setAttribute('aria-label', 'Previous unit');
+rosterPrevBtn.innerHTML = '&#8592;';
+const rosterNextBtn = document.createElement('button');
+rosterNextBtn.className = 'roster-arrow is-next';
+rosterNextBtn.setAttribute('aria-label', 'Next unit');
+rosterNextBtn.innerHTML = '&#8594;';
+const rosterLabelEl = document.createElement('div');
+rosterLabelEl.className = 'roster-label';
+rosterLabelEl.innerHTML = '<span class="rl-counter"></span><span class="rl-name"></span>';
+const rosterTicksEl = document.createElement('div');
+rosterTicksEl.className = 'roster-ticks';
+PROJECTS.forEach(()=>{ const t=document.createElement('span'); t.className='rtick'; rosterTicksEl.appendChild(t); });
+const stageEl = document.querySelector('.stage');
+stageEl.appendChild(rosterPrevBtn);
+stageEl.appendChild(rosterNextBtn);
+stageEl.appendChild(rosterLabelEl);
+stageEl.appendChild(rosterTicksEl);
+
+function renderRoster(idx){
+  const total = PROJECTS.length;
+  arsenalEl.querySelectorAll('.robot').forEach((r,i)=>{
+    r.dataset.rosterRole = i===idx?'ctr' : i===idx-1?'pre' : i===idx+1?'nxt' : '';
+  });
+  const p = PROJECTS[idx];
+  const rlc = rosterLabelEl.querySelector('.rl-counter');
+  const rln = rosterLabelEl.querySelector('.rl-name');
+  if(rlc) rlc.textContent = `${p.id} / ${String(total).padStart(2,'0')}`;
+  if(rln) rln.textContent = `${p.unit}  ·  ${p.class}`;
+  /* arrows: hide at edges (arrow at 01 → prev hidden; at last → next hidden) */
+  rosterPrevBtn.setAttribute('aria-hidden', String(idx===0));
+  rosterNextBtn.setAttribute('aria-hidden', String(idx===total-1));
+  /* ticks */
+  rosterTicksEl.querySelectorAll('.rtick').forEach((t,i)=>t.classList.toggle('is-active',i===idx));
+  /* unit-nav sync */
+  unitRail.querySelectorAll('.unit').forEach((u,i)=>u.classList.toggle('is-active',i===idx));
+}
+
+function stepRoster(dir){
+  if(rosterStepping) return;
+  const next=rosterIdx+dir;
+  if(next<0||next>=PROJECTS.length) return;
+  rosterStepping=true; rosterIdx=next; renderRoster(rosterIdx);
+  setTimeout(()=>{ rosterStepping=false; },620);
+}
+
+function stepRosterTo(idx){
+  if(idx<0||idx>=PROJECTS.length||rosterStepping) return;
+  rosterStepping=true; rosterIdx=idx; renderRoster(idx);
+  setTimeout(()=>{ rosterStepping=false; },620);
+}
+
+function rosterClick(id,locked,el){
+  if(!inArsenal) return;
+  const role=el.dataset.rosterRole;
+  if(role==='pre'){ stepRoster(-1); return; }
+  if(role==='nxt'){ stepRoster(1);  return; }
+  if(role!=='ctr') return;
+  if(locked){
+    el.classList.add('is-denied');
+    setTimeout(()=>el.classList.remove('is-denied'),480);
+    return;
+  }
+  openPanel(id);
+}
+
+rosterPrevBtn.addEventListener('click',()=>stepRoster(-1));
+rosterNextBtn.addEventListener('click',()=>stepRoster(1));
+
+document.addEventListener('keydown',e=>{
+  if(!inArsenal||panel.classList.contains('is-open')) return;
+  if(e.key==='ArrowLeft'){ e.preventDefault(); stepRoster(-1); }
+  if(e.key==='ArrowRight'){ e.preventDefault(); stepRoster(1); }
+});
+
+let swipeX=null;
+arsenal.addEventListener('touchstart',e=>{ swipeX=e.touches[0].clientX; },{passive:true});
+arsenal.addEventListener('touchend',e=>{
+  if(swipeX===null) return;
+  const dx=e.changedTouches[0].clientX-swipeX; swipeX=null;
+  if(Math.abs(dx)>44) stepRoster(dx<0?1:-1);
+});
 
 /* ============================================================
    PAGE-1 REVEAL ENGINE — newgif JPG sequence (240 frames, dark→lit EMPTY hall)
@@ -240,12 +337,14 @@ const COMMIT_AT = 0.965;                        // scroll this far → lock into
 const TR_SWAP = 520, TR_END = 1340;             // loading-beat timing: cover swaps content / cover lifts
 
 function revealRobots(){
-  [...arsenalEl.querySelectorAll('.robot')].forEach((r,i)=>{
-    r.style.transitionDelay = (i*0.07)+'s'; r.classList.add('on');   // staggered PNG fade-in
-  });
+  rosterIdx = 0;
+  renderRoster(0);
+  arsenalEl.querySelectorAll('.robot').forEach(r=>{ r.style.transitionDelay='0s'; r.classList.add('on'); });
 }
 function clearRobots(){
-  arsenalEl.querySelectorAll('.robot').forEach(r=>{ r.style.transitionDelay='0s'; r.classList.remove('on'); });
+  arsenalEl.querySelectorAll('.robot').forEach(r=>{
+    r.style.transitionDelay='0s'; r.classList.remove('on'); r.dataset.rosterRole='';
+  });
 }
 
 /* ---------- transition flavor text (V3 "DEPLOYING UNITS" beat — cycles, not a static spinner) ---------- */
