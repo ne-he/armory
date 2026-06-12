@@ -332,7 +332,7 @@ body:not(.is-calibrate) .stage.is-arsenal .arsenal .robot:hover {
    bigger center grows UPWARD from the same floor. */
 body:not(.is-calibrate) .stage.is-arsenal .robot {
   left:50%;
-  bottom:13%;
+  bottom:8%;
   width:clamp(120px,18vh,210px);
   transform:translateX(-50%);
   transform-origin:50% 100%;          /* scale/grow from the feet */
@@ -349,13 +349,18 @@ body:not(.is-calibrate) .stage.is-arsenal .robot {
 
 /* CENTER — powered on, BIG (grows up from the floor, clears the title) */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
-  width:clamp(180px,30vh,380px);
+  width:clamp(220px,36vh,500px);
   opacity:1;
   pointer-events:auto;
   filter:none;
   z-index:10;
   cursor:pointer;
 }
+
+/* Spotlight pool ONLY under the center unit — stops a warm "shadow/pool" from
+   sliding behind the others while stepping. */
+body:not(.is-calibrate) .stage.is-arsenal .robot::before { opacity:0; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]::before { opacity:.5; }
 
 /* Center hover: warm glow intensifies */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]:not(.is-locked):hover .robot-body {
@@ -454,7 +459,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* Roster label */
 .roster-label {
   position:absolute;
-  bottom:9.5%;
+  bottom:4%;
   left:50%;transform:translateX(-50%);
   z-index:15;
   text-align:center;
@@ -477,7 +482,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* Progress ticks */
 .roster-ticks {
   position:absolute;
-  bottom:6%;
+  bottom:1.5%;
   left:50%;transform:translateX(-50%);
   z-index:15;
   display:flex;gap:6px;
@@ -500,7 +505,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* ============================================================
    HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
    ============================================================ */
-.hall-title{position:absolute;top:5.5%;left:50%;transform:translateX(-50%) translateY(-8px);
+.hall-title{position:absolute;top:4%;left:50%;transform:translateX(-50%) translateY(-8px);
   z-index:12;text-align:center;pointer-events:none;opacity:0;
   transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0)}
