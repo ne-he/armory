@@ -11,9 +11,7 @@
 <link href="https://api.fontshare.com/v2/css?f[]=neue-machina@400,500,800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="armory.css" />
-<!-- GSAP + ScrollTrigger (Page-1 video scrub). If offline, engine falls back to a manual scroll driver. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- Engine is self-contained vanilla JS (manual scroll driver) — no external deps. -->
 </head>
 <body class="is-loading">
 
@@ -24,6 +22,15 @@
     <div class="ld-bar"><i></i></div>
     <div class="ld-pct">000%</div>
     <div class="ld-status">SYSTEM BOOTING</div>
+  </div>
+
+  <!-- ============ TRANSITION / LOADING BEAT (Page 1 → Page 2, one-way) ============ -->
+  <div class="transition" aria-hidden="true">
+    <div class="tr-core">
+      <div class="tr-ring"></div>
+      <div class="tr-label">Deploying Units</div>
+      <div class="tr-bar"><i></i></div>
+    </div>
   </div>
 
   <!-- ============ SCROLL TRACK (drives the pinned stage) ============ -->
@@ -57,6 +64,11 @@
         <span class="ht-main">ARMORY HALL</span>
         <span class="ht-sub">Selected Works · MMXXVI</span>
       </div>
+
+      <!-- POWER DOWN — return from Page 2 to the dark, un-lit hall -->
+      <button class="home-btn" type="button" aria-label="Power down — return to the dark hall">
+        <span class="hb-icon">⏻</span><span class="hb-label">Power Down</span>
+      </button>
 
       <!-- atmosphere -->
       <div class="layer layer-scan"></div>
