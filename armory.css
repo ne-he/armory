@@ -200,9 +200,11 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
   z-index:9;text-align:center;transition:opacity .5s var(--ease);
 }
 .stage.is-arsenal .user-hint{opacity:0}
-.uh-label{font-family:var(--fr-mono);font-size:12px;letter-spacing:.42em;
-  color:var(--warm);text-transform:uppercase;padding-left:.42em}
-.uh-sub{font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.3em;color:var(--muted);margin-top:9px}
+.uh-label{font-family:var(--fr-mono);font-size:clamp(14px,1.55vw,18px);letter-spacing:.32em;
+  color:var(--warm);text-transform:uppercase;padding-left:.32em;
+  text-shadow:0 0 18px rgba(255,180,84,.45)}
+.uh-sub{font-family:var(--fr-mono);font-size:clamp(10.5px,1.05vw,13px);letter-spacing:.26em;
+  color:var(--amber-soft);margin-top:11px;padding-left:.26em}
 .uh-arrow{width:1px;height:40px;margin:18px auto 0;position:relative;overflow:hidden;
   background:linear-gradient(var(--amber),transparent)}
 .uh-arrow::after{content:"";position:absolute;top:0;left:50%;margin-left:-3px;width:5px;height:5px;
@@ -321,11 +323,10 @@ body.is-locked #idle { filter:blur(8px) brightness(0.45); }
 /* Hide the old unit-nav in roster mode — ticks + label replace it */
 .stage.is-arsenal .unit-nav { opacity:0 !important; pointer-events:none; }
 
-/* Neutralize the arc hover rules — roster CSS handles appearance */
-body:not(.is-calibrate) .stage.is-arsenal .arsenal:hover .robot { filter:none; }
-body:not(.is-calibrate) .stage.is-arsenal .arsenal .robot:hover {
-  filter:none; transform:translateX(-50%); z-index:auto;
-}
+/* NOTE: the old arc hover rules (.arsenal:hover .robot{filter…}) are left intact
+   but always LOSE to the role selectors below on specificity, so previews keep
+   their powered-off look even while the cursor is anywhere in the hall. (An earlier
+   filter:none "neutralizer" here was the bug that lit the previews up on any hover.) */
 
 /* All robots: hidden by default (feet on a SHARED floor line so every slot lines
    up), override arc --x/--y/--w positioning. Only width changes per role so the
@@ -349,7 +350,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot {
 
 /* CENTER — powered on, BIG (grows up from the floor, clears the title) */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
-  width:clamp(220px,36vh,500px);
+  width:clamp(240px,40vh,540px);
   opacity:1;
   pointer-events:auto;
   filter:none;
@@ -379,7 +380,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"].is-lock
 /* SIDE PREVIEWS (pre/nxt) — POWERED OFF: near-black silhouettes, no glow at rest */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"],
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
-  width:clamp(85px,14vh,160px);
+  width:clamp(120px,21vh,250px);
   opacity:.62;
   pointer-events:auto;
   cursor:pointer;
@@ -387,8 +388,8 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
   z-index:4;
   transform:translateX(-50%) scale(.96);
 }
-body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] { left:23%; }
-body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:77%; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] { left:19%; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:81%; }
 
 /* Kill the warm bloom on the preview body so it can't glow while "off" */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] .robot-body,
@@ -411,11 +412,14 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="far-nxt"] {
   transform:translateX(-50%) scale(.9);
 }
 
-/* Preview hover: lift slightly out of the dark (still clearly "secondary") */
+/* Preview hover: lift slightly out of the dark (still clearly "secondary").
+   transform/z-index pinned so the legacy .arsenal .robot:hover can't scale them. */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"]:hover,
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"]:hover {
   filter:brightness(.34) grayscale(.7) blur(1px);
   opacity:.7;
+  transform:translateX(-50%) scale(.96);
+  z-index:4;
 }
 
 /* Previews: no tooltip */
@@ -505,15 +509,15 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* ============================================================
    HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
    ============================================================ */
-.hall-title{position:absolute;top:4%;left:50%;transform:translateX(-50%) translateY(-8px);
+.hall-title{position:absolute;top:2.6%;left:50%;transform:translateX(-50%) translateY(-8px);
   z-index:12;text-align:center;pointer-events:none;opacity:0;
   transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0)}
 .ht-main{display:block;font-family:var(--fr-display);font-weight:800;
-  font-size:clamp(26px,5.4vw,80px);letter-spacing:.26em;line-height:1;
+  font-size:clamp(22px,4.5vw,68px);letter-spacing:.24em;line-height:1;
   color:transparent;-webkit-text-stroke:1px rgba(255,217,160,.5);
   text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em}
-.ht-sub{display:block;margin-top:14px;font-family:var(--fr-mono);font-size:clamp(8px,.8vw,11px);
+.ht-sub{display:block;margin-top:9px;font-family:var(--fr-mono);font-size:clamp(8px,.8vw,11px);
   letter-spacing:.52em;text-transform:uppercase;color:var(--muted);padding-left:.52em}
 
 /* ============================================================
