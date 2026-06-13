@@ -579,7 +579,7 @@ body.is-dossier .stage.is-arsenal .robot[data-roster-role="nxt"]{
    HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
    ============================================================ */
 .hall-title{position:absolute;top:2.6%;left:50%;transform:translateX(-50%) translateY(-8px);
-  z-index:20;text-align:center;pointer-events:none;opacity:0;cursor:default;
+  z-index:20;text-align:center;pointer-events:none;opacity:0;cursor:default;white-space:nowrap;
   transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 .ht-main{position:relative;display:block;font-family:var(--fr-display);font-weight:800;
