@@ -469,8 +469,9 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
   white-space:nowrap;opacity:0;padding-left:.34em;
 }
 body.is-locked .center-hint{ display:block; }              /* Page 2 only — never on the scrub page */
-body.is-locked .center-hint.show{ animation:hintBlink 2.8s var(--ease) infinite; }  /* gentler, slower fade */
-@keyframes hintBlink{ 0%,100%{opacity:0} 22%{opacity:.92} 60%{opacity:.92} 84%{opacity:0} }
+/* lighthouse pulse: symmetric ease-in-out so fade-in == fade-out, even & smooth */
+body.is-locked .center-hint.show{ animation:hintBlink 3s ease-in-out infinite; }
+@keyframes hintBlink{ 0%{opacity:0} 50%{opacity:.95} 100%{opacity:0} }
 
 /* ============================================================
    DOSSIER MODE — click a unit: it slides LEFT and stays lit, the
