@@ -69,7 +69,7 @@ const PROJECTS = [
     summary:'End-to-end pipeline for phone-addiction level.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
     description:`An end-to-end training pipeline (preprocessing, augmentation, evaluation) that predicts a person's level of phone addiction, served with a shared preprocessing core so the model behaves the same in training and in production.`,
     stats:{pwr:88,spd:75,def:92}, links:{live:'https://addictv2.vercel.app/',code:'https://github.com/ne-he/Addictv2'} },
-  { id:'06', unit:'CADENCE', name:'Familys Web', type:'Full-stack Web App', class:'Forge', accent:'#e8742c',
+  { id:'06', unit:'CADENCE', name:"Family's Web", type:'Full-stack Web App', class:'Forge', accent:'#e8742c',
     x:'52%', y:'31%', w:'8.8vw', z:4, status:'live',
     summary:'A family web app, all in one dashboard.', tech:['TypeScript','JavaScript','PostgreSQL'],
     description:`A family web app that brings tasks, reminders, and shared information together in one clean dashboard.`,
