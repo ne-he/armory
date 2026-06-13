@@ -350,7 +350,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot {
 
 /* CENTER — powered on, BIG (grows up from the floor, clears the title) */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
-  width:clamp(240px,40vh,540px);
+  width:clamp(250px,42vh,560px);
   opacity:1;
   pointer-events:auto;
   filter:none;
@@ -380,7 +380,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"].is-lock
 /* SIDE PREVIEWS (pre/nxt) — POWERED OFF: near-black silhouettes, no glow at rest */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"],
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
-  width:clamp(120px,21vh,250px);
+  width:clamp(150px,25vh,290px);
   opacity:.62;
   pointer-events:auto;
   cursor:pointer;
@@ -388,8 +388,8 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
   z-index:4;
   transform:translateX(-50%) scale(.96);
 }
-body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] { left:19%; }
-body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:81%; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] { left:18%; }
+body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:82%; }
 
 /* Kill the warm bloom on the preview body so it can't glow while "off" */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] .robot-body,
@@ -471,17 +471,25 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
   opacity:0;
   transition:opacity .4s var(--ease);
   white-space:nowrap;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 .stage.is-arsenal .roster-label { opacity:1; }
 .rl-counter {
-  font-family:var(--fr-mono);font-size:10px;letter-spacing:.35em;
-  color:var(--amber-soft);padding-left:.35em;
+  font-family:var(--fr-mono);font-size:11px;letter-spacing:.4em;
+  color:var(--amber-soft);padding-left:.4em;
+}
+/* project name = the hero line (the floating hover tooltip is retired) */
+.rl-title {
+  font-family:var(--fr-display);font-weight:700;
+  font-size:clamp(19px,2.1vw,32px);letter-spacing:.03em;color:var(--text);
+  text-shadow:0 0 26px rgba(0,0,0,.55);
 }
 .rl-name {
-  font-family:var(--fr-display);font-weight:600;
-  font-size:clamp(13px,1.4vw,19px);letter-spacing:.08em;color:var(--text);
+  font-family:var(--fr-mono);font-size:clamp(10px,1.05vw,13px);letter-spacing:.28em;
+  text-transform:uppercase;color:var(--amber-soft);padding-left:.28em;
 }
+.roster-label.is-locked .rl-title { color:var(--muted); }
+.roster-label.is-locked .rl-name  { color:var(--muted-2); }
 
 /* Progress ticks */
 .roster-ticks {
@@ -512,13 +520,25 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 .hall-title{position:absolute;top:2.6%;left:50%;transform:translateX(-50%) translateY(-8px);
   z-index:12;text-align:center;pointer-events:none;opacity:0;
   transition:opacity 1s var(--ease),transform 1s var(--ease)}
-.stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0)}
+.stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 .ht-main{display:block;font-family:var(--fr-display);font-weight:800;
-  font-size:clamp(22px,4.5vw,68px);letter-spacing:.24em;line-height:1;
+  font-size:clamp(24px,4.8vw,74px);letter-spacing:.24em;line-height:1;
   color:transparent;-webkit-text-stroke:1px rgba(255,217,160,.5);
-  text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em}
-.ht-sub{display:block;margin-top:9px;font-family:var(--fr-mono);font-size:clamp(8px,.8vw,11px);
-  letter-spacing:.52em;text-transform:uppercase;color:var(--muted);padding-left:.52em}
+  text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em;transform-origin:50% 50%;
+  transition:color .5s var(--ease),text-shadow .5s var(--ease),
+             -webkit-text-stroke-color .5s var(--ease),transform .5s var(--ease)}
+/* hover = "power on the marquee": fill the letters + radiate a glory bloom */
+.hall-title{cursor:default}
+.hall-title:hover .ht-main{
+  color:rgba(255,226,172,.94);
+  -webkit-text-stroke-color:rgba(255,233,198,.95);
+  text-shadow:0 0 14px rgba(255,201,107,.75),0 0 42px rgba(244,169,58,.8),
+              0 0 96px rgba(244,169,58,.55),0 0 150px rgba(255,201,107,.35);
+  transform:scale(1.03)}
+.hall-title:hover .ht-sub{color:var(--warm)}
+.ht-sub{display:block;margin-top:12px;font-family:var(--fr-mono);font-size:clamp(11px,1.15vw,15px);
+  letter-spacing:.5em;text-transform:uppercase;color:var(--amber-soft);padding-left:.5em;
+  transition:color .5s var(--ease)}
 
 /* ============================================================
    TRANSITION BEAT — scrub done → bloom flash + SYSTEM ONLINE → Page 2
