@@ -10,7 +10,7 @@
 <!-- Display: Neue Machina (mechanical/geometric) · Body: Space Grotesk · Mono: Space Mono -->
 <link href="https://api.fontshare.com/v2/css?f[]=neue-machina@400,500,800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="armory.css?v=7" />
+<link rel="stylesheet" href="armory.css?v=8" />
 <!-- Engine is self-contained vanilla JS (manual scroll driver) — no external deps. -->
 </head>
 <body class="is-loading">
@@ -53,6 +53,12 @@
         <div class="pf-particles"></div>
       </div>
 
+      <!-- PHASE 1 hero — temporary hologram standee (placeholder until the particle
+           portrait from /hover part lands); dissolves out as the hall powers on -->
+      <div id="heroFigure" class="layer" aria-hidden="true">
+        <img src="generated/hologram-removebg-preview.png" alt="" />
+      </div>
+
       <!-- ARSENAL (phase 3) -->
       <div class="arsenal">
         <div class="arsenal-floor"></div>
@@ -61,8 +67,8 @@
 
       <!-- TITLE (layered, themed — replaces the corner logo + AI-looking HUD readout) -->
       <div class="hall-title">
-        <span class="ht-main">NEMI'S GARAGE</span>
-        <span class="ht-sub">Hall of Projects</span>
+        <span class="ht-main" data-text="NEMI'S GARAGE">NEMI'S GARAGE</span>
+        <span class="ht-sub">Wilhelmus Industries</span>
       </div>
 
       <!-- POWER DOWN — return from Page 2 to the dark, un-lit hall -->
@@ -74,6 +80,9 @@
       <div class="layer layer-scan"></div>
       <div class="layer layer-vignette"></div>
       <div class="layer layer-grain"></div>
+
+      <!-- whole-hall dimmer: fades in only while the marquee title is hovered -->
+      <div class="hall-dim" aria-hidden="true"></div>
 
       <!-- cinematic transition beat (scrub done → Page 2) -->
       <div class="flash" aria-hidden="true"></div>
@@ -108,12 +117,11 @@
       <h2 class="panel-name">UNIT</h2>
       <div class="panel-status">● STATUS — DEPLOYED</div>
     </div>
-    <!-- project-page preview slot — fill via project.preview (screenshot URL) -->
-    <div class="panel-img">
-      <div class="pi-grid"></div>
-      <img class="pi-shot" alt="Project preview" />
-      <div class="pi-placeholder">PROJECT PREVIEW<span>Screenshot slot — coming soon</span></div>
-    </div>
+    <!-- video-demo banner — enable by setting project.demo to a video/page URL -->
+    <button class="panel-demo" type="button">
+      <span class="pd-play">▶</span>
+      <span class="pd-label">Watch Demo</span>
+    </button>
     <div class="panel-body">
       <span class="panel-type">TYPE</span>
       <div>
@@ -140,6 +148,6 @@
     <span class="r-corner bl"></span><span class="r-corner br"></span>
   </div>
 
-  <script src="armory.js?v=7"></script>
+  <script src="armory.js?v=8"></script>
 </body>
 </html>

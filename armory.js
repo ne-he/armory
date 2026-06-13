@@ -14,24 +14,26 @@ document.documentElement.style.setProperty('--mech', MECH_SVG);
    & height, evenly spaced) standing in front of that trio. Fine-tune live with ?calibrate. */
 const ROBOT_IMG = 'generated/robot2_clear.png';
 
-/* Language composition per unit (real languages; percentages are seeded-random
-   placeholders — swap with real numbers later in LANGS_BY_ID/makeLangs). */
+/* Real language composition per unit — pulled from each GitHub repo's /languages
+   API (bytes → %), top languages rounded to sum 100. web_portofolio_RAG (04) is
+   private (404) so its split is an estimate; coming-soon units are placeholders. */
 const LANGS_BY_ID = {
-  '01':['Python','Jupyter'], '02':['Python','SQL','Docker'], '03':['Python','Jupyter'],
-  '04':['TypeScript','JavaScript','CSS'], '05':['Python','Shell','Docker'], '06':['JavaScript','HTML','CSS'],
-  '07':['TypeScript','CSS','HTML'], '08':['Python','TypeScript'],
-  '09':['Python'], '10':['JavaScript','CSS','HTML'],
+  '01':[['Python',90],['Jupyter',10]],
+  '02':[['Python',69],['HTML',30],['Dockerfile',1]],
+  '03':[['TypeScript',87],['Jupyter',10],['CSS',2],['Python',1]],
+  '04':[['TypeScript',78],['CSS',14],['JavaScript',8]],
+  '05':[['Jupyter',96],['JavaScript',3],['Python',1]],
+  '06':[['TypeScript',69],['JavaScript',27],['PLpgSQL',3],['CSS',1]],
+  '07':[['TypeScript',70],['HTML',15],['CSS',11],['JavaScript',4]],
+  '08':[['Python',60],['TypeScript',40]],
+  '09':[['Classified',100]],
+  '10':[['JavaScript',55],['CSS',30],['HTML',15]],
 };
-function makeLangs(id){
-  const names = LANGS_BY_ID[id] || ['Python'];
-  let seed = parseInt(id,10)*13+7;
-  const rnd = ()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
-  const w = names.map(()=>0.35+rnd());
-  const sum = w.reduce((a,b)=>a+b,0);
-  const pct = w.map(x=>Math.round(x/sum*100));
-  pct[0] += 100 - pct.reduce((a,b)=>a+b,0);          // normalize to exactly 100
-  return names.map((name,i)=>({name,pct:pct[i]})).sort((a,b)=>b.pct-a.pct);
-}
+function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
+
+/* Robot designation = "MARK <roman>" by slot order (the only name shown). */
+const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
 
 /* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
@@ -145,36 +147,59 @@ const scrim = document.querySelector('.panel-scrim');
 const panel = document.querySelector('.panel');
 function openPanel(id){
   const p = PROJECTS.find(x=>x.id===id); if(!p) return;
+  const idx = PROJECTS.indexOf(p);
   panel.style.setProperty('--glow', p.accent);
   panel.querySelector('.panel-type').textContent = p.type;
   panel.querySelector('.panel-name').textContent = p.name;
-  panel.querySelector('.panel-desig').textContent = `${p.unit} · ${(p.class||'').toUpperCase()} CLASS`;
+  panel.querySelector('.panel-desig').textContent = markName(idx);     // single name: MARK <roman>
   panel.querySelector('.panel-status').innerHTML = p.status==='coming_soon'
-    ? '◇ STATUS — CLASSIFIED' : '● STATUS — DEPLOYED';
+    ? '◇ STATUS — IN DEVELOPMENT' : '● STATUS — DEPLOYED';
   panel.querySelector('.panel-brief').textContent = p.description;
-  /* project-page preview slot (set p.preview to a screenshot URL to fill it) */
-  const shot = panel.querySelector('.pi-shot');
-  const ph   = panel.querySelector('.pi-placeholder');
-  if(p.preview){ shot.src=p.preview; shot.style.display='block'; if(ph) ph.style.display='none'; }
-  else { shot.removeAttribute('src'); shot.style.display='none'; if(ph) ph.style.display='flex'; }
+  /* video-demo banner (set p.demo to a video/page URL to enable it) */
+  const demo = panel.querySelector('.panel-demo');
+  if(demo){
+    const hasDemo = !!p.demo;
+    demo.querySelector('.pd-label').textContent = hasDemo ? 'Watch Demo' : 'Demo — Coming Soon';
+    demo.classList.toggle('is-disabled', !hasDemo);
+    demo.onclick = hasDemo ? ()=>window.open(p.demo,'_blank','noopener') : null;
+  }
   /* chips */
   panel.querySelector('.chips').innerHTML = p.tech.map(t=>`<span class="chip">${t}</span>`).join('');
-  /* languages (percentages = placeholder until real numbers go into LANGS_BY_ID) */
+  /* languages — real %s from the repo's GitHub /languages */
   panel.querySelector('.stats').innerHTML = (p.langs||[]).map(l=>`
     <div class="stat"><span class="stat-k">${l.name}</span>
     <span class="stat-bar"><i style="--v:0%" data-v="${l.pct}%"></i></span>
     <span class="stat-v">${l.pct}%</span></div>`).join('');
-  /* links */
-  const L=[]; if(p.links.live) L.push(`<a class="btn-link" href="${p.links.live}" target="_blank" rel="noopener">View Live ↗</a>`);
-  if(p.links.code) L.push(`<a class="btn-link ghost" href="${p.links.code}" target="_blank" rel="noopener">Source ↗</a>`);
-  panel.querySelector('.panel-links').innerHTML = L.join('') || `<span class="btn-link ghost" style="pointer-events:none">${p.status==='coming_soon'?'Declassified Soon':'Links Coming Soon'}</span>`;
+  /* links — always show both; disabled until a URL exists */
+  const live = p.links && p.links.live, code = p.links && p.links.code;
+  const L = [
+    live ? `<a class="btn-link" href="${live}" target="_blank" rel="noopener">Visit Web ↗</a>`
+         : `<span class="btn-link is-disabled">Visit Web — Soon</span>`,
+    code ? `<a class="btn-link ghost" href="${code}" target="_blank" rel="noopener">Source ↗</a>`
+         : `<span class="btn-link ghost is-disabled">Source — Soon</span>`,
+  ];
+  panel.querySelector('.panel-links').innerHTML = L.join('');
+  document.body.classList.add('is-dossier');                 // robot slides left + stays lit, panel = right half
+  updateCenterHint();                                        // hide the blinking hint while reading
   scrim.classList.add('is-open'); panel.classList.add('is-open');
   requestAnimationFrame(()=>setTimeout(()=>panel.querySelectorAll('.stat-bar i').forEach(b=>b.style.width=b.dataset.v),120));
 }
-function closePanel(){ scrim.classList.remove('is-open'); panel.classList.remove('is-open'); }
+function closePanel(){
+  scrim.classList.remove('is-open'); panel.classList.remove('is-open');
+  document.body.classList.remove('is-dossier');
+  updateCenterHint();
+}
 scrim.addEventListener('click', closePanel);
 panel.querySelector('.panel-back').addEventListener('click', closePanel);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+
+/* title "power on" — hovering the marquee dims the whole hall and glory-glitches
+   the title so only it stays lit */
+const hallTitleEl = document.querySelector('.hall-title');
+if(hallTitleEl){
+  hallTitleEl.addEventListener('mouseenter', ()=>document.body.classList.add('title-glow'));
+  hallTitleEl.addEventListener('mouseleave', ()=>document.body.classList.remove('title-glow'));
+}
 
 /* ============================================================
    ROSTER STEP-NAV (V4)
@@ -199,11 +224,28 @@ rosterLabelEl.innerHTML = '<span class="rl-counter"></span><span class="rl-title
 const rosterTicksEl = document.createElement('div');
 rosterTicksEl.className = 'roster-ticks';
 PROJECTS.forEach(()=>{ const t=document.createElement('span'); t.className='rtick'; rosterTicksEl.appendChild(t); });
+const centerHintEl = document.createElement('div');
+centerHintEl.className = 'center-hint';
+centerHintEl.textContent = 'Click for details';
 const stageEl = document.querySelector('.stage');
 stageEl.appendChild(rosterPrevBtn);
 stageEl.appendChild(rosterNextBtn);
 stageEl.appendChild(rosterLabelEl);
 stageEl.appendChild(rosterTicksEl);
+stageEl.appendChild(centerHintEl);
+
+/* "Click for details" blinks above the head — only once the unit has settled in
+   the centre (hidden while sliding) and only for live (clickable) units. */
+let hintTimer = null;
+function updateCenterHint(){
+  clearTimeout(hintTimer);
+  centerHintEl.classList.remove('show');
+  const p = PROJECTS[rosterIdx];
+  if(!inArsenal || !p || p.status==='coming_soon' || document.body.classList.contains('is-dossier')) return;
+  hintTimer = setTimeout(()=>{
+    if(!rosterStepping && !document.body.classList.contains('is-dossier')) centerHintEl.classList.add('show');
+  }, 660);
+}
 
 function renderRoster(idx){
   const total = PROJECTS.length;
@@ -221,8 +263,9 @@ function renderRoster(idx){
   const rln = rosterLabelEl.querySelector('.rl-name');
   if(rlc) rlc.textContent = `${p.id} / ${String(total).padStart(2,'0')}`;
   if(rlt) rlt.textContent = p.name;                       // real project name (the hero line)
-  if(rln) rln.textContent = locked ? '◇ COMING SOON' : `${p.unit}  ·  ${p.class}`;
+  if(rln) rln.textContent = locked ? '◇ COMING SOON' : markName(idx);   // single name: MARK <roman>
   rosterLabelEl.classList.toggle('is-locked', locked);
+  updateCenterHint();
   /* arrows: hide at edges (arrow at 01 → prev hidden; at last → next hidden) */
   rosterPrevBtn.setAttribute('aria-hidden', String(idx===0));
   rosterNextBtn.setAttribute('aria-hidden', String(idx===total-1));
