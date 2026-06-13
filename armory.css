@@ -213,6 +213,22 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
 @keyframes arr{0%{top:-6px;opacity:0}40%{opacity:1}100%{top:34px;opacity:0}}
 
 /* ============================================================
+   PAGE-1 HERO HOLOGRAM — temporary standee placeholder (until the
+   particle portrait from /hover part lands). Stands on the floor,
+   dissolves out as the hall powers on.
+   ============================================================ */
+#heroFigure{z-index:6;display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:6vh;pointer-events:none;
+  transition:opacity .7s var(--ease),transform 1.1s var(--ease),filter .8s var(--ease)}
+#heroFigure img{height:min(64vh,660px);width:auto;object-fit:contain;
+  filter:drop-shadow(0 0 44px rgba(255,180,84,.28)) drop-shadow(0 18px 30px rgba(0,0,0,.6))}
+.stage[data-phase="2"] #heroFigure{opacity:.85}
+.stage[data-phase="3"] #heroFigure,
+.stage.is-arsenal #heroFigure{opacity:0;transform:translateY(-4%) scale(1.05);filter:blur(8px)}
+body.is-locked #heroFigure{display:none}
+@media (prefers-reduced-motion: reduce){ #heroFigure{transition:none} }
+
+/* ============================================================
    ARSENAL — robots on an arc
    ============================================================ */
 /* arsenal stays fully hidden through the scrub; only the cinematic beat reveals it */
@@ -438,6 +454,43 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
   animation:rosterDeny .44s ease;
 }
 
+/* ---- "Click for details" — blinks above the centred unit's head ---- */
+.center-hint{
+  position:absolute;left:50%;top:24vh;transform:translateX(-50%);
+  z-index:14;pointer-events:none;
+  font-family:var(--fr-mono);font-size:clamp(10px,1vw,12.5px);letter-spacing:.34em;
+  text-transform:uppercase;color:var(--warm);text-shadow:0 0 14px rgba(255,180,84,.6);
+  white-space:nowrap;opacity:0;padding-left:.34em;
+}
+.center-hint.show{ animation:hintBlink 1.7s var(--ease) infinite; }
+@keyframes hintBlink{ 0%,100%{opacity:0} 18%{opacity:.95} 55%{opacity:.95} 78%{opacity:0} }
+
+/* ============================================================
+   DOSSIER MODE — click a unit: it slides LEFT and stays lit, the
+   briefing fills the RIGHT half. (toggled by body.is-dossier)
+   ============================================================ */
+body.is-dossier .stage.is-arsenal .robot[data-roster-role="ctr"]{
+  left:27%;
+  z-index:45;                                   /* lift above the scrim so it stays bright */
+}
+body.is-dossier .stage.is-arsenal .robot[data-roster-role="ctr"] .robot-body{
+  filter:drop-shadow(0 0 54px var(--amber)) brightness(1.16);   /* lit like hover */
+}
+/* clear the roster chrome + side previews while reading */
+body.is-dossier .roster-arrow,
+body.is-dossier .roster-label,
+body.is-dossier .roster-ticks,
+body.is-dossier .center-hint,
+body.is-dossier .stage.is-arsenal .robot[data-roster-role="pre"],
+body.is-dossier .stage.is-arsenal .robot[data-roster-role="nxt"]{
+  opacity:0 !important;pointer-events:none !important;
+}
+@media (max-width:760px){
+  /* on phones the panel is full-width, so just push the unit fully behind it */
+  .panel{width:100vw}
+  body.is-dossier .stage.is-arsenal .robot[data-roster-role="ctr"]{opacity:.18}
+}
+
 /* Arrow buttons */
 .roster-arrow {
   position:absolute;
@@ -518,27 +571,40 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
    HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
    ============================================================ */
 .hall-title{position:absolute;top:2.6%;left:50%;transform:translateX(-50%) translateY(-8px);
-  z-index:12;text-align:center;pointer-events:none;opacity:0;
+  z-index:20;text-align:center;pointer-events:none;opacity:0;cursor:default;
   transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .stage.is-arsenal .hall-title{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-.ht-main{display:block;font-family:var(--fr-display);font-weight:800;
+.ht-main{position:relative;display:block;font-family:var(--fr-display);font-weight:800;
   font-size:clamp(24px,4.8vw,74px);letter-spacing:.24em;line-height:1;
   color:transparent;-webkit-text-stroke:1px rgba(255,217,160,.5);
   text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em;transform-origin:50% 50%;
   transition:color .5s var(--ease),text-shadow .5s var(--ease),
              -webkit-text-stroke-color .5s var(--ease),transform .5s var(--ease)}
-/* hover = "power on the marquee": fill the letters + radiate a glory bloom */
-.hall-title{cursor:default}
-.hall-title:hover .ht-main{
-  color:rgba(255,226,172,.94);
+/* glory-glitch ghost layers — warm/bright, not cold cyber; hidden until hover */
+.ht-main::before,.ht-main::after{
+  content:attr(data-text);position:absolute;left:0;top:0;width:100%;padding-left:.26em;
+  text-align:center;letter-spacing:.24em;-webkit-text-stroke:0;opacity:0;pointer-events:none}
+/* hover (body.title-glow): fill the letters + glory bloom + warm glitch flicker */
+body.title-glow .ht-main{
+  color:rgba(255,226,172,.95);
   -webkit-text-stroke-color:rgba(255,233,198,.95);
-  text-shadow:0 0 14px rgba(255,201,107,.75),0 0 42px rgba(244,169,58,.8),
-              0 0 96px rgba(244,169,58,.55),0 0 150px rgba(255,201,107,.35);
+  text-shadow:0 0 14px rgba(255,201,107,.8),0 0 44px rgba(244,169,58,.85),
+              0 0 100px rgba(244,169,58,.6),0 0 160px rgba(255,201,107,.4);
   transform:scale(1.03)}
-.hall-title:hover .ht-sub{color:var(--warm)}
+body.title-glow .ht-main::before{color:rgba(255,176,84,.9);opacity:.9;animation:gloryA .8s steps(2,end) infinite}
+body.title-glow .ht-main::after{color:rgba(255,245,216,.85);opacity:.75;animation:gloryB 1.05s steps(2,end) infinite}
+body.title-glow .ht-sub{color:var(--warm)}
+@keyframes gloryA{0%,100%{transform:translate(0,0);clip-path:inset(0 0 68% 0)}
+  50%{transform:translate(3px,-1px);clip-path:inset(58% 0 0 0)}}
+@keyframes gloryB{0%,100%{transform:translate(0,0);clip-path:inset(66% 0 0 0)}
+  50%{transform:translate(-3px,1px);clip-path:inset(0 0 60% 0)}}
 .ht-sub{display:block;margin-top:12px;font-family:var(--fr-mono);font-size:clamp(11px,1.15vw,15px);
   letter-spacing:.5em;text-transform:uppercase;color:var(--amber-soft);padding-left:.5em;
   transition:color .5s var(--ease)}
+/* whole-hall dimmer: fades in only while the marquee is hovered; title sits above it */
+.hall-dim{position:absolute;inset:0;z-index:16;background:rgba(2,3,4,.74);
+  opacity:0;pointer-events:none;transition:opacity .5s var(--ease)}
+body.title-glow .hall-dim{opacity:1}
 
 /* ============================================================
    TRANSITION BEAT — scrub done → bloom flash + SYSTEM ONLINE → Page 2
@@ -592,69 +658,73 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
 /* ============================================================
    DOSSIER PANEL
    ============================================================ */
-/* Scrim: gradient only (NO backdrop blur) so the selected center robot stays sharp
-   on the left while the panel side darkens. */
+/* Scrim: flat dark wash. The selected unit is lifted ABOVE this (z-index:45) in
+   dossier mode, so it stays bright on the left while everything behind it dims. */
 .panel-scrim{position:fixed;inset:0;z-index:40;
-  background:linear-gradient(90deg, rgba(4,5,7,.10) 0%, rgba(4,5,7,.42) 52%, rgba(4,5,7,.82) 100%);
-  opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+  background:rgba(4,5,7,.6);
+  opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
 .panel-scrim.is-open{opacity:1;pointer-events:auto}
 .panel-host{position:fixed;inset:0;overflow:hidden;z-index:41;pointer-events:none}
-.panel{position:absolute;top:0;right:0;height:100%;width:min(480px,92vw);
-  background:linear-gradient(180deg,#0d1116,#080a0d);
-  border-left:1px solid var(--line);box-shadow:-30px 0 80px rgba(0,0,0,.6);
-  transform:translateX(100%);transition:transform .5s var(--ease);
-  display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin}
+
+/* Panel = RIGHT HALF, warm near-black ("old money mafia"), gold accents */
+.panel{position:absolute;top:0;right:0;height:100%;width:min(960px,48vw);
+  background:linear-gradient(180deg,#0b0a08,#060504);
+  border-left:1px solid var(--line);box-shadow:-40px 0 110px rgba(0,0,0,.72);
+  transform:translateX(100%);transition:transform .55s var(--ease);
+  display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin;pointer-events:auto}
 .panel.is-open{transform:translateX(0)}
 .panel-accent{position:absolute;top:0;left:0;width:3px;height:100%;background:var(--glow,var(--amber));
-  box-shadow:0 0 20px var(--glow,var(--amber))}
-.panel-head{padding:30px 32px 22px;border-bottom:1px solid var(--line-soft);position:relative}
+  box-shadow:0 0 22px var(--glow,var(--amber))}
+.panel-head{padding:clamp(28px,3.4vw,52px) clamp(30px,3.6vw,60px) 24px;border-bottom:1px solid var(--line-soft);position:relative}
 .panel-back{display:inline-flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;
-  font-family:var(--fr-mono);font-size:10px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;
-  padding:0;margin-bottom:22px;transition:color .3s}
+  font-family:var(--fr-mono);font-size:11px;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;
+  padding:0;margin-bottom:26px;transition:color .3s}
 .panel-back:hover{color:var(--amber-soft)}
-.panel-type{display:inline-block;font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.3em;
-  text-transform:uppercase;color:var(--glow,var(--amber-soft));border:1px solid var(--line);
-  padding:5px 10px;margin-bottom:16px}
-.panel-desig{font-family:var(--fr-mono);font-size:9px;letter-spacing:.34em;color:var(--muted-2);text-transform:uppercase}
-.panel-name{font-family:var(--fr-display);font-weight:800;font-size:clamp(30px,4.4vw,46px);
-  letter-spacing:.02em;line-height:.98;margin:6px 0 4px}
-.panel-status{font-family:var(--fr-mono);font-size:10px;letter-spacing:.2em;color:var(--amber-soft)}
-.panel-img{margin:0 32px 4px;aspect-ratio:16/10;border:1px solid var(--line-soft);
-  background:linear-gradient(135deg,#13161b,#0a0c0f);position:relative;overflow:hidden;margin-top:24px}
-/* project-page screenshot (fills when project.preview is set) */
-.panel-img .pi-shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;z-index:2}
-/* empty-state placeholder — the slot waiting for a screenshot */
-.panel-img .pi-placeholder{position:absolute;inset:0;z-index:1;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  font-family:var(--fr-mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;
-  color:var(--muted);text-align:center}
-.panel-img .pi-placeholder span{font-size:8.5px;letter-spacing:.2em;color:var(--muted-2)}
-.panel-img .pi-grid{position:absolute;inset:0;opacity:.4;
-  background:linear-gradient(rgba(244,169,58,.06) 1px,transparent 1px) 0 0/100% 28px,
-            linear-gradient(90deg,rgba(244,169,58,.06) 1px,transparent 1px) 0 0/28px 100%}
-.panel-body{padding:24px 32px 40px;display:flex;flex-direction:column;gap:26px}
-.field-label{font-family:var(--fr-mono);font-size:9.5px;letter-spacing:.32em;color:var(--muted-2);
-  text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:10px}
+.panel-desig{font-family:var(--fr-mono);font-size:11px;letter-spacing:.34em;color:var(--amber-soft);text-transform:uppercase}
+.panel-name{font-family:var(--fr-display);font-weight:800;font-size:clamp(34px,3.9vw,60px);
+  letter-spacing:.01em;line-height:1.02;margin:10px 0 8px;color:#f3ece0}
+.panel-status{font-family:var(--fr-mono);font-size:11px;letter-spacing:.2em;color:var(--amber-soft)}
+
+/* video-demo banner (repurposes the old preview slot) */
+.panel-demo{display:flex;align-items:center;justify-content:center;gap:14px;
+  margin:clamp(20px,2.4vw,32px) clamp(30px,3.6vw,60px) 0;
+  padding:clamp(15px,1.5vw,21px);background:rgba(255,255,255,.02);
+  border:1px solid var(--line);cursor:pointer;
+  font-family:var(--fr-mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--text);
+  transition:background .3s,border-color .3s,color .3s}
+.panel-demo:hover{background:rgba(244,169,58,.10);border-color:var(--amber);color:#fff}
+.panel-demo .pd-play{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--amber);color:var(--amber);font-size:11px;padding-left:2px}
+.panel-demo.is-disabled{opacity:.45;cursor:not-allowed}
+.panel-demo.is-disabled:hover{background:rgba(255,255,255,.02);border-color:var(--line);color:var(--text)}
+
+.panel-body{padding:clamp(26px,2.6vw,40px) clamp(30px,3.6vw,60px) 50px;display:flex;flex-direction:column;gap:clamp(24px,2.3vw,34px)}
+.panel-type{display:inline-block;align-self:flex-start;font-family:var(--fr-mono);font-size:10.5px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--glow,var(--amber-soft));border:1px solid var(--line);padding:6px 12px}
+.field-label{font-family:var(--fr-mono);font-size:10.5px;letter-spacing:.32em;color:var(--muted-2);
+  text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:10px}
 .field-label::after{content:"";flex:1;height:1px;background:var(--line-soft)}
-.panel-brief{font-size:14.5px;line-height:1.65;color:#c9c2b5;text-wrap:pretty}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--fr-mono);font-size:10px;letter-spacing:.12em;color:var(--text);
-  border:1px solid var(--line-soft);padding:6px 11px;background:rgba(255,255,255,.02)}
-.stats{display:flex;flex-direction:column;gap:14px}
-.stat{display:grid;grid-template-columns:96px 1fr 38px;align-items:center;gap:12px}
-.stat-k{font-family:var(--fr-mono);font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
-.stat-bar{height:5px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
+.panel-brief{font-size:clamp(15px,1.05vw,17.5px);line-height:1.72;color:#cfc8ba;text-wrap:pretty}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{font-family:var(--fr-mono);font-size:11px;letter-spacing:.1em;color:var(--text);
+  border:1px solid var(--line-soft);padding:7px 13px;background:rgba(255,255,255,.02)}
+.stats{display:flex;flex-direction:column;gap:15px}
+.stat{display:grid;grid-template-columns:clamp(96px,9vw,140px) 1fr 46px;align-items:center;gap:14px}
+.stat-k{font-family:var(--fr-mono);font-size:11px;letter-spacing:.1em;color:var(--text);text-transform:uppercase}
+.stat-bar{height:6px;background:rgba(255,255,255,.06);position:relative;overflow:hidden;border-radius:3px}
 .stat-bar i{position:absolute;left:0;top:0;height:100%;width:var(--v,0%);
-  background:linear-gradient(90deg,var(--glow),var(--warm));box-shadow:0 0 12px var(--glow)}
-.stat-v{font-family:var(--fr-mono);font-size:11px;color:var(--text);text-align:right}
-.panel-links{display:flex;gap:10px;flex-wrap:wrap}
-.btn-link{flex:1;min-width:130px;text-align:center;text-decoration:none;
-  font-family:var(--fr-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  padding:13px 16px;border:1px solid var(--line);color:var(--text);background:rgba(244,169,58,.05);
-  transition:background .3s,color .3s}
+  background:linear-gradient(90deg,var(--glow),var(--warm));box-shadow:0 0 12px var(--glow);
+  transition:width .9s var(--ease)}
+.stat-v{font-family:var(--fr-mono);font-size:12px;color:var(--text);text-align:right}
+.panel-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.btn-link{flex:1;min-width:150px;text-align:center;text-decoration:none;
+  font-family:var(--fr-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  padding:15px 18px;border:1px solid var(--line);color:var(--text);background:rgba(244,169,58,.05);
+  transition:background .3s,color .3s,border-color .3s}
 .btn-link:hover{background:var(--amber);color:#1a1206}
 .btn-link.ghost{background:transparent;border-color:var(--line-soft);color:var(--muted)}
 .btn-link.ghost:hover{border-color:var(--line);color:var(--text);background:rgba(255,255,255,.03)}
+.btn-link.is-disabled{opacity:.4;pointer-events:none;background:transparent;border-style:dashed;color:var(--muted-2)}
 
 /* ============================================================
    RETICLE
