@@ -693,9 +693,6 @@ body.title-glow .hall-dim{opacity:1}
 .panel-name{font-family:var(--fr-display);font-weight:800;font-size:clamp(34px,3.9vw,60px);
   letter-spacing:.01em;line-height:1.02;margin:10px 0 8px;color:#f3ece0}
 .panel-status{font-family:var(--fr-mono);font-size:13px;letter-spacing:.2em;color:var(--amber-soft)}
-/* Roman numeral vinculum (lines above + below) — e.g. MARK II */
-.rn{display:inline-block;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
-  padding:2px 5px 1px;margin-left:.18em;line-height:1.05}
 
 /* video-demo banner (repurposes the old preview slot) */
 .panel-demo{display:flex;align-items:center;justify-content:center;gap:14px;

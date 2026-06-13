@@ -31,10 +31,9 @@ const LANGS_BY_ID = {
 };
 function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
 
-/* Robot designation = "MARK <roman>" by slot order (the only name shown). The
-   numeral is wrapped so CSS can give it a vinculum (lines above + below). */
+/* Robot designation = "MARK <roman>" by slot order (the only name shown). */
 const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-function markName(idx){ return 'MARK <span class="rn">' + (ROMAN[idx+1] || String(idx+1)) + '</span>'; }
+function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
 
 /* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
@@ -449,7 +448,7 @@ function commitToArsenal(){
   beatTimers.forEach(clearTimeout); beatTimers = [];
   drawFrameAt(1);                               // hold the lit empty hall behind the cover
   document.body.classList.add('is-transition'); // dark loading cover fades in
-  cycleTransition(['DEPLOYING UNITS','CALIBRATING ARSENAL','SPINNING UP CORES','UNITS ONLINE']);
+  cycleTransition(['LOADING']);
   beatTimers.push(setTimeout(()=>{
     document.body.classList.remove('is-scrubbing');
     document.body.classList.add('is-locked');   // kill scroll + pin the stage to the viewport
@@ -529,7 +528,7 @@ const loader = document.getElementById('loader');
 const ldBar = loader.querySelector('.ld-bar i');
 const ldPct = loader.querySelector('.ld-pct');
 const ldStatus = loader.querySelector('.ld-status');
-const steps = ['SYSTEM BOOTING','CALIBRATING OPTICS','POWERING ALCOVES','UNITS ONLINE'];
+const steps = ['LOADING'];
 
 let realPct = 0, shownPct = 0, complete = false;
 onPreloadProgress = pr => { realPct = Math.min(99, pr*100); };
