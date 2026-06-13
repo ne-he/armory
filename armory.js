@@ -31,9 +31,10 @@ const LANGS_BY_ID = {
 };
 function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
 
-/* Robot designation = "MARK <roman>" by slot order (the only name shown). */
+/* Robot designation = "MARK <roman>" by slot order (the only name shown). The
+   numeral is wrapped so CSS can give it a vinculum (lines above + below). */
 const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
+function markName(idx){ return 'MARK <span class="rn">' + (ROMAN[idx+1] || String(idx+1)) + '</span>'; }
 
 /* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
@@ -43,55 +44,55 @@ function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
    SENTINEL…) while `name` stays the real project title. Order: 7 live first, the 3
    coming_soon units (ORACLE, CIPHER, AEGIS) are pinned LAST so they read as locked. */
 const PROJECTS = [
-  { id:'01', unit:'LANTERN', name:'Waste Detection — CNN & Grad-CAM', type:'Deep Learning / Explainable AI', class:'Luminary', accent:'#e0a93a',
+  { id:'01', unit:'LANTERN', name:'Waste Image Classifier with Grad-CAM', type:'Deep Learning / Computer Vision', class:'Luminary', accent:'#e0a93a',
     x:'8%', y:'30%', w:'13vw', z:10, status:'live',
-    summary:'Notebook to production: 90.3% accuracy, explained.', tech:['TensorFlow/Keras','MobileNetV2','Grad-CAM','FastAPI','PyTest'],
-    description:`Waste image classification on TrashNet refactored from a Jupyter notebook into a modular, config-driven, tested Python project. MobileNetV2 transfer learning hits 90.3% validation accuracy (baseline CNN: 54.5%), Grad-CAM highlights what the model actually looks at, and a FastAPI service + CLI make it usable beyond the notebook.`,
-    stats:{pwr:84,spd:78,def:86}, links:{live:'',code:'https://github.com/ne-he/Deep_Learning_imageclassif'} },
-  { id:'02', unit:'KEYSTONE', name:'Feature Shopz — Feature Store', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
+    summary:'Sorts waste images, explained with Grad-CAM.', tech:['TensorFlow/Keras','MobileNetV2','Grad-CAM','FastAPI','PyTest'],
+    description:`A deep-learning model that sorts waste images, with Grad-CAM heat-maps that make every prediction explainable instead of a black box. It refactors a Jupyter notebook into a modular, tested Python project served behind a FastAPI endpoint.`,
+    stats:{pwr:84,spd:78,def:86}, links:{live:'https://deep-learning-imageclassif.vercel.app/',code:'https://github.com/ne-he/Deep_Learning_imageclassif'} },
+  { id:'02', unit:'KEYSTONE', name:'Feature Shops', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
     x:'18%', y:'31%', w:'11.5vw', z:8, status:'live',
-    summary:'Production-grade feature store, end to end.', tech:['Python','PostgreSQL','Redis','FastAPI','Streamlit','Evidently','Docker'],
-    description:`E-commerce feature store that ingests transaction data, computes 20+ user-level features in batch, stores them in PostgreSQL (offline) + Redis (online), and serves them through a low-latency FastAPI. A Streamlit dashboard with Evidently watches freshness and drift. All four milestones (ingestion → monitoring) shipped.`,
-    stats:{pwr:90,spd:70,def:85}, links:{live:'',code:'https://github.com/ne-he/Feature_shopz'} },
-  { id:'03', unit:'SENTINEL', name:'URL Detector — Threat Classifier', type:'Machine Learning / Security', class:'Warden', accent:'#36c2a8',
+    summary:'Production-grade feature serving for e-commerce.', tech:['Python','PostgreSQL','Redis','FastAPI','Streamlit','Evidently','Docker'],
+    description:`A production-grade ML feature serving system for e-commerce, computing 23 user-level features from raw transaction data. A dual-store architecture (PostgreSQL for offline training, Redis for low-latency online serving) is exposed through a FastAPI REST API with automatic fallback and daily batch orchestration, drift detection with Evidently, and a Streamlit monitoring dashboard. Shipped with 174 tests and 95% coverage, deployed live on Hugging Face Spaces.`,
+    stats:{pwr:90,spd:70,def:85}, links:{live:'https://huggingface.co/spaces/ne-he/feature-store-mvp',code:'https://github.com/ne-he/Feature_shopz'} },
+  { id:'03', unit:'SENTINEL', name:'Phishing URL Detector', type:'Deep Learning / Security', class:'Warden', accent:'#36c2a8',
     x:'27%', y:'32%', w:'9.5vw', z:6, status:'live',
-    summary:'Sniffs out malicious URLs before they bite.', tech:['Python','scikit-learn','Pandas','Feature Engineering'],
-    description:`A machine-learning classifier that flags malicious and phishing URLs from lexical and host-based signals — URL length, token patterns, suspicious characters, and domain features — turning a raw link into a clear safe / unsafe verdict.`,
-    stats:{pwr:82,spd:80,def:88}, links:{live:'',code:'https://github.com/ne-he/URL_Detection'} },
-  { id:'04', unit:'MNEMONIC', name:'Web Portfolio — RAG Chatbot', type:'GenAI / RAG', class:'Mirror', accent:'#c9ced6',
+    summary:'Flags phishing links with a confidence score.', tech:['Python','Deep Learning','FastAPI','Pandas'],
+    description:`A deep-learning backend that inspects a link and flags whether it is phishing or not, returning a confidence percentage alongside the model accuracy.`,
+    stats:{pwr:82,spd:80,def:88}, links:{live:'https://hci-update.vercel.app/',code:'https://github.com/ne-he/URL_Detection'} },
+  { id:'04', unit:'MNEMONIC', name:'Personal Resume Chatbot', type:'GenAI / RAG', class:'Mirror', accent:'#c9ced6',
     x:'35%', y:'32%', w:'9vw', z:5, status:'live',
-    summary:'A portfolio that answers back — RAG over everything Nehemiah.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
-    description:`Personal site where a RAG chatbot is the core: a Gemini LLM + embeddings over a curated markdown knowledge base (Supabase pgvector), serving cited, hallucination-gated answers about projects, skills, and journey.`,
-    stats:{pwr:92,spd:60,def:70}, links:{live:'',code:'https://github.com/ne-he/web_portofolio_RAG'} },
-  { id:'05', unit:'AUGUR', name:'Phone Addiction Predictor v2', type:'ML Engineering / Production — Flagship', class:'Prime', accent:'#ff7a1a',
+    summary:'A conversational about-me, powered by RAG.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
+    description:`An AI assistant that answers questions about me, a conversational about-me rather than a commercial bot. It runs on a retrieval-augmented (RAG) pipeline (a large language model plus embeddings and a vector database) with a live, queryable demo.`,
+    stats:{pwr:92,spd:60,def:70}, links:{live:'https://web-portofolio-rag.vercel.app/',code:'https://github.com/ne-he/web_portofolio_RAG'} },
+  { id:'05', unit:'AUGUR', name:'Addiction Prediction', type:'ML Engineering / Production', class:'Prime', accent:'#ff7a1a',
     x:'43%', y:'32%', w:'10vw', z:9, status:'live',
-    summary:'The flagship: one preprocessing core, zero skew, deployed.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
-    description:`Production-ready rewrite of a smartphone-addiction-level regressor (CatBoost, scale 1–10). One shared Preprocessor class is the single source of truth for training, the FastAPI service, and the Streamlit demo — eliminating training/serving skew by design. Ships with SHAP explanations, tests, CI, Docker, and a live HuggingFace Space deployment.`,
-    stats:{pwr:88,spd:75,def:92}, links:{live:'',code:'https://github.com/ne-he/Addictv2'} },
-  { id:'06', unit:'CADENCE', name:'To-Do List Organizer', type:'Productivity Web App', class:'Forge', accent:'#e8742c',
+    summary:'End-to-end pipeline for phone-addiction level.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
+    description:`An end-to-end training pipeline (preprocessing, augmentation, evaluation) that predicts a person's level of phone addiction, served with a shared preprocessing core so the model behaves the same in training and in production.`,
+    stats:{pwr:88,spd:75,def:92}, links:{live:'https://addictv2.vercel.app/',code:'https://github.com/ne-he/Addictv2'} },
+  { id:'06', unit:'CADENCE', name:'Familys Web', type:'Full-stack Web App', class:'Forge', accent:'#e8742c',
     x:'52%', y:'31%', w:'8.8vw', z:4, status:'live',
-    summary:'One dashboard for the whole day.', tech:['HTML/CSS/JS','Kiro AI'],
-    description:`A clean productivity dashboard combining a live clock with greeting, a focus timer, a to-do list, and quick links in one interface. Built as a Software Engineering mini project with an AI-assisted (Kiro) workflow — fast to ship, simple to use.`,
-    stats:{pwr:50,spd:95,def:55}, links:{live:'',code:'https://github.com/ne-he/Partai_Wilhelmus'} },
+    summary:'A family web app, all in one dashboard.', tech:['TypeScript','JavaScript','PostgreSQL'],
+    description:`A family web app that brings tasks, reminders, and shared information together in one clean dashboard.`,
+    stats:{pwr:50,spd:95,def:55}, links:{live:'https://partai-wilhelmus.vercel.app/',code:'https://github.com/ne-he/Partai_Wilhelmus'} },
   { id:'07', unit:'HAVOC', name:'Clash of Bangs', type:'Interactive Web / HCI Lab', class:'Striker', accent:'#e0312e',
     x:'60%', y:'31%', w:'9vw', z:3, status:'live',
-    summary:'A Human-Computer Interaction lab, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
-    description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo: an Express 5 API with PostgreSQL + Drizzle ORM, Zod validation everywhere, and Orval generating typed API hooks straight from the OpenAPI spec — so frontend and backend can never drift apart.`,
-    stats:{pwr:74,spd:82,def:70}, links:{live:'',code:'https://github.com/ne-he/hci_lab'} },
-  { id:'08', unit:'ORACLE', name:'RAG Chatbot — Business', type:'GenAI / RAG — In Development', class:'Sage', accent:'#9b7be0',
+    summary:'An HCI lab final, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
+    description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo with an Express 5 API, PostgreSQL + Drizzle ORM, Zod validation, and Orval generating typed API hooks from the OpenAPI spec so the frontend and backend can never drift apart.`,
+    stats:{pwr:74,spd:82,def:70}, links:{live:'https://web-hci-final-clash-of-bang.vercel.app/',code:'https://github.com/ne-he/hci_lab'} },
+  { id:'08', unit:'ORACLE', name:'RAG Chatbot', type:'GenAI / RAG', class:'Sage', accent:'#9b7be0',
     x:'68%', y:'34%', w:'8vw', z:2, status:'coming_soon',
-    summary:'A business-grade RAG assistant. Under construction.', tech:['RAG','LLM','Vector DB'],
-    description:`A business-focused Retrieval-Augmented Generation assistant — grounding answers in a company's own documents and knowledge base. Currently in active development.`,
+    summary:'In development.', tech:[],
+    description:`In development.`,
     stats:{pwr:0,spd:0,def:0}, links:{} },
   { id:'09', unit:'CIPHER', name:'Classified', type:'Coming Soon', class:'Unknown', accent:'#8a8276',
     x:'78%', y:'33%', w:'8.5vw', z:1, status:'coming_soon',
     summary:'Sealed until launch.', tech:[],
-    description:`The next unit in the lineup — sealed until it ships.`,
+    description:`Sealed until launch.`,
     stats:{pwr:0,spd:0,def:0}, links:{} },
-  { id:'10', unit:'AEGIS', name:"Nemi's Garage", type:'Creative Web / You Are Here', class:'Chaos', accent:'#d8419b',
+  { id:'10', unit:'AEGIS', name:'Classified', type:'Coming Soon', class:'Unknown', accent:'#8a8276',
     x:'90%', y:'30%', w:'10vw', z:7, status:'coming_soon',
-    summary:'The hall you are standing in right now.', tech:['Canvas','Frame-Scrub','Vanilla JS'],
-    description:`This very site: a cinematic two-act portfolio where a dark hall powers on as you scroll and its units step out to present each project. Canvas frame-scrubbing and a character-select arsenal. Under construction — you're watching it being built.`,
+    summary:'Sealed until launch.', tech:[],
+    description:`Sealed until launch.`,
     stats:{pwr:0,spd:0,def:0}, links:{} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
    to any project above — it renders in the panel preview slot automatically. */
@@ -148,12 +149,12 @@ const panel = document.querySelector('.panel');
 function openPanel(id){
   const p = PROJECTS.find(x=>x.id===id); if(!p) return;
   const idx = PROJECTS.indexOf(p);
-  panel.style.setProperty('--glow', p.accent);
+  panel.style.setProperty('--glow', '#f4a93a');                        // amber — keep the panel cohesive (no per-unit blue)
   panel.querySelector('.panel-type').textContent = p.type;
   panel.querySelector('.panel-name').textContent = p.name;
-  panel.querySelector('.panel-desig').textContent = markName(idx);     // single name: MARK <roman>
-  panel.querySelector('.panel-status').innerHTML = p.status==='coming_soon'
-    ? '◇ STATUS — IN DEVELOPMENT' : '● STATUS — DEPLOYED';
+  panel.querySelector('.panel-desig').innerHTML = markName(idx);       // single name: MARK <roman>
+  panel.querySelector('.panel-status').textContent = p.status==='coming_soon'
+    ? 'COMING SOON' : 'STATUS DEPLOYED';
   panel.querySelector('.panel-brief').textContent = p.description;
   /* video-demo banner (set p.demo to a video/page URL to enable it) */
   const demo = panel.querySelector('.panel-demo');
@@ -263,7 +264,7 @@ function renderRoster(idx){
   const rln = rosterLabelEl.querySelector('.rl-name');
   if(rlc) rlc.textContent = `${p.id} / ${String(total).padStart(2,'0')}`;
   if(rlt) rlt.textContent = p.name;                       // real project name (the hero line)
-  if(rln) rln.textContent = locked ? '◇ COMING SOON' : markName(idx);   // single name: MARK <roman>
+  if(rln) rln.innerHTML = locked ? 'COMING SOON' : markName(idx);   // single name: MARK <roman>
   rosterLabelEl.classList.toggle('is-locked', locked);
   updateCenterHint();
   /* arrows: hide at edges (arrow at 01 → prev hidden; at last → next hidden) */
@@ -470,6 +471,7 @@ function returnHome(){
   beatTimers.push(setTimeout(()=>{
     stage.classList.remove('is-arsenal','is-flash');
     clearRobots();
+    centerHintEl.classList.remove('show');       // don't let the hint blink on Page 1
     if(idleV){ try{ idleV.pause(); idleV.currentTime = 0; }catch(_){} }
     document.body.classList.remove('is-locked');
     document.body.classList.add('is-scrubbing'); // restore the tall scrub track
