@@ -25,7 +25,7 @@ const LANGS_BY_ID = {
   '05':[['Jupyter',96],['JavaScript',3],['Python',1]],
   '06':[['TypeScript',69],['JavaScript',27],['PLpgSQL',3],['CSS',1]],
   '07':[['TypeScript',70],['HTML',15],['CSS',11],['JavaScript',4]],
-  '08':[['Python',60],['TypeScript',40]],
+  '08':[['Python',93],['HTML',6],['Dockerfile',1]],
   '09':[['Classified',100]],
   '10':[['JavaScript',55],['CSS',30],['HTML',15]],
 };
@@ -40,8 +40,8 @@ function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
    ones receding into the hall. All share the placeholder PNG until the unique
    robot-XX.png renders exist. Unit codenames are theatrical single words (LANTERN,
-   SENTINEL…) while `name` stays the real project title. Order: 7 live first, the 3
-   coming_soon units (ORACLE, CIPHER, AEGIS) are pinned LAST so they read as locked. */
+   SENTINEL…) while `name` stays the real project title. Order: 8 live first, the 2
+   coming_soon units (CIPHER, AEGIS) are pinned LAST so they read as locked. */
 const PROJECTS = [
   { id:'01', unit:'LANTERN', name:'Waste Image Classifier with Grad-CAM', type:'Deep Learning / Computer Vision', class:'Luminary', accent:'#e0a93a',
     x:'8%', y:'30%', w:'13vw', z:10, status:'live',
@@ -78,11 +78,11 @@ const PROJECTS = [
     summary:'An HCI lab final, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
     description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo with an Express 5 API, PostgreSQL + Drizzle ORM, Zod validation, and Orval generating typed API hooks from the OpenAPI spec so the frontend and backend can never drift apart.`,
     stats:{pwr:74,spd:82,def:70}, links:{live:'https://web-hci-final-clash-of-bang.vercel.app/',code:'https://github.com/ne-he/hci_lab'} },
-  { id:'08', unit:'ORACLE', name:'RAG Chatbot', type:'GenAI / RAG', class:'Sage', accent:'#9b7be0',
-    x:'68%', y:'34%', w:'8vw', z:2, status:'coming_soon',
-    summary:'In development.', tech:[],
-    description:`In development.`,
-    stats:{pwr:0,spd:0,def:0}, links:{} },
+  { id:'08', unit:'ORACLE', name:'FinSight', type:'GenAI / Financial RAG', class:'Sage', accent:'#9b7be0',
+    x:'68%', y:'34%', w:'8vw', z:2, status:'live',
+    summary:'RAG over SEC 10-K filings, cited and gated against fabrication.', tech:['Python','Gemini','FastAPI','BM25','NumPy','Supabase pgvector'],
+    description:`A production-grade RAG system that answers questions about public companies strictly from their SEC 10-K filings, with section-level citations (e.g. Item 1A Risk Factors) and a strict anti-fabrication gate that replies "not found in the filings" instead of inventing a number. It uses section-aware 10-K chunking, hybrid retrieval (dense Gemini embeddings plus BM25) fused with Reciprocal Rank Fusion, and company/year metadata filtering. On a 947-chunk corpus (NVDA, AAPL, MSFT) it measured 100% retrieval hit-rate at 6 and 100% out-of-scope gate accuracy with a golden-set eval harness.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'',code:'https://github.com/ne-he/RAG_businessAnalysis_assist'} },
   { id:'09', unit:'CIPHER', name:'Classified', type:'Coming Soon', class:'Unknown', accent:'#8a8276',
     x:'78%', y:'33%', w:'8.5vw', z:1, status:'coming_soon',
     summary:'Sealed until launch.', tech:[],
@@ -159,7 +159,7 @@ function openPanel(id){
   const demo = panel.querySelector('.panel-demo');
   if(demo){
     const hasDemo = !!p.demo;
-    demo.querySelector('.pd-label').textContent = hasDemo ? 'Watch Demo' : 'Demo — Coming Soon';
+    demo.querySelector('.pd-label').textContent = hasDemo ? 'Watch Demo' : 'Demo (Coming Soon)';
     demo.classList.toggle('is-disabled', !hasDemo);
     demo.onclick = hasDemo ? ()=>window.open(p.demo,'_blank','noopener') : null;
   }
@@ -174,9 +174,9 @@ function openPanel(id){
   const live = p.links && p.links.live, code = p.links && p.links.code;
   const L = [
     live ? `<a class="btn-link" href="${live}" target="_blank" rel="noopener">Visit Web ↗</a>`
-         : `<span class="btn-link is-disabled">Visit Web — Soon</span>`,
+         : `<span class="btn-link is-disabled">Visit Web (Soon)</span>`,
     code ? `<a class="btn-link ghost" href="${code}" target="_blank" rel="noopener">Source ↗</a>`
-         : `<span class="btn-link ghost is-disabled">Source — Soon</span>`,
+         : `<span class="btn-link ghost is-disabled">Source (Soon)</span>`,
   ];
   panel.querySelector('.panel-links').innerHTML = L.join('');
   document.body.classList.add('is-dossier');                 // robot slides left + stays lit, panel = right half
