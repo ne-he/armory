@@ -10,7 +10,7 @@
 <!-- Display: Neue Machina (mechanical/geometric) · Body: Space Grotesk · Mono: Space Mono -->
 <link href="https://api.fontshare.com/v2/css?f[]=neue-machina@400,500,800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="armory.css?v=13" />
+<link rel="stylesheet" href="armory.css?v=14" />
 <!-- Engine is self-contained vanilla JS (manual scroll driver) — no external deps. -->
 </head>
 <body class="is-loading">
@@ -117,11 +117,12 @@
       <h2 class="panel-name">UNIT</h2>
       <div class="panel-status">● STATUS — DEPLOYED</div>
     </div>
-    <!-- video-demo banner — enable by setting project.demo to a video/page URL -->
-    <button class="panel-demo" type="button">
-      <span class="pd-play">▶</span>
-      <span class="pd-label">Watch Demo</span>
-    </button>
+    <!-- video-demo — set project.demo to a YouTube URL: hover plays inline (muted) -->
+    <div class="panel-demo">
+      <div class="pd-poster"></div>
+      <div class="pd-frame"></div>
+      <div class="pd-cta"><span class="pd-play">▶</span><span class="pd-label">Watch Demo</span></div>
+    </div>
     <div class="panel-body">
       <span class="panel-type">TYPE</span>
       <div>
@@ -148,6 +149,6 @@
     <span class="r-corner bl"></span><span class="r-corner br"></span>
   </div>
 
-  <script src="armory.js?v=13"></script>
+  <script src="armory.js?v=14"></script>
 </body>
 </html>
