@@ -155,13 +155,18 @@ function openPanel(id){
   panel.querySelector('.panel-status').textContent = p.status==='coming_soon'
     ? 'COMING SOON' : 'STATUS DEPLOYED';
   panel.querySelector('.panel-brief').textContent = p.description;
-  /* video-demo banner (set p.demo to a video/page URL to enable it) */
+  /* video-demo (set p.demo to a YouTube URL → hover plays it inline, muted) */
   const demo = panel.querySelector('.panel-demo');
   if(demo){
-    const hasDemo = !!p.demo;
-    demo.querySelector('.pd-label').textContent = hasDemo ? 'Watch Demo' : 'Demo (Coming Soon)';
-    demo.classList.toggle('is-disabled', !hasDemo);
-    demo.onclick = hasDemo ? ()=>window.open(p.demo,'_blank','noopener') : null;
+    const ytId = p.demo ? parseYouTube(p.demo) : null;
+    demo.classList.toggle('has-video', !!ytId);
+    demo.classList.toggle('is-disabled', !p.demo);
+    demo.dataset.yt = ytId || '';
+    demo.dataset.demo = p.demo || '';
+    demo.querySelector('.pd-frame').innerHTML = '';                 // stop any previous clip
+    demo.querySelector('.pd-label').textContent = p.demo ? 'Watch Demo' : 'Demo (Coming Soon)';
+    demo.querySelector('.pd-poster').style.backgroundImage =
+      ytId ? `url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg')` : '';
   }
   /* chips */
   panel.querySelector('.chips').innerHTML = p.tech.map(t=>`<span class="chip">${t}</span>`).join('');
@@ -192,6 +197,23 @@ function closePanel(){
 scrim.addEventListener('click', closePanel);
 panel.querySelector('.panel-back').addEventListener('click', closePanel);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+
+/* ---- video-demo: hover-to-play (YouTube embed loaded only on hover = zero
+   page-load weight); click opens the full video in a new tab ---- */
+function parseYouTube(u){
+  const m = String(u).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+  return m ? m[1] : null;
+}
+const demoBox = panel.querySelector('.panel-demo');
+if(demoBox){
+  const frame = demoBox.querySelector('.pd-frame');
+  demoBox.addEventListener('mouseenter', ()=>{
+    const id = demoBox.dataset.yt; if(!id || frame.querySelector('iframe')) return;
+    frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&modestbranding=1&rel=0&playsinline=1" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+  });
+  demoBox.addEventListener('mouseleave', ()=>{ frame.innerHTML = ''; });   // stop playback
+  demoBox.addEventListener('click', ()=>{ const u = demoBox.dataset.demo; if(u) window.open(u,'_blank','noopener'); });
+}
 
 /* title "power on" — hovering the marquee dims the whole hall and glory-glitches
    the title so only it stays lit */
