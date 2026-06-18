@@ -694,18 +694,30 @@ body.title-glow .hall-dim{opacity:1}
   letter-spacing:.01em;line-height:1.02;margin:10px 0 8px;color:#f3ece0}
 .panel-status{font-family:var(--fr-mono);font-size:13px;letter-spacing:.2em;color:var(--amber-soft)}
 
-/* video-demo banner (repurposes the old preview slot) */
-.panel-demo{display:flex;align-items:center;justify-content:center;gap:14px;
+/* video-demo — banner by default; with a YouTube link it becomes a 16:9 poster
+   that auto-plays (muted) inline on hover. The iframe loads ONLY on hover, so it
+   never adds weight to page/panel load. */
+.panel-demo{position:relative;display:flex;align-items:center;justify-content:center;min-height:56px;
   margin:clamp(20px,2.4vw,32px) clamp(30px,3.6vw,60px) 0;
-  padding:clamp(15px,1.5vw,21px);background:rgba(255,255,255,.02);
-  border:1px solid var(--line);cursor:pointer;
+  background:rgba(255,255,255,.02);border:1px solid var(--line);cursor:pointer;overflow:hidden;
+  transition:background .3s,border-color .3s}
+.panel-demo:hover{background:rgba(244,169,58,.10);border-color:var(--amber)}
+.panel-demo .pd-poster,.panel-demo .pd-frame{position:absolute;inset:0}
+.panel-demo .pd-poster{background:#0a0908 center/cover no-repeat;opacity:0}
+.panel-demo .pd-frame{z-index:1}
+.panel-demo .pd-frame iframe{width:100%;height:100%;display:block;border:0}
+.panel-demo .pd-cta{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;
   font-family:var(--fr-mono);font-size:13px;letter-spacing:.26em;text-transform:uppercase;color:var(--text);
-  transition:background .3s,border-color .3s,color .3s}
-.panel-demo:hover{background:rgba(244,169,58,.10);border-color:var(--amber);color:#fff}
+  transition:opacity .3s}
 .panel-demo .pd-play{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
   border:1px solid var(--amber);color:var(--amber);font-size:11px;padding-left:2px}
 .panel-demo.is-disabled{opacity:.45;cursor:not-allowed}
-.panel-demo.is-disabled:hover{background:rgba(255,255,255,.02);border-color:var(--line);color:var(--text)}
+.panel-demo.is-disabled:hover{background:rgba(255,255,255,.02);border-color:var(--line)}
+/* with a video link */
+.panel-demo.has-video{aspect-ratio:16/9;min-height:0;border-color:var(--line)}
+.panel-demo.has-video .pd-poster{opacity:1}
+.panel-demo.has-video .pd-cta{position:absolute;inset:0;background:rgba(6,5,4,.42)}
+.panel-demo.has-video:hover .pd-cta{opacity:0}   /* clear the overlay while it plays */
 
 .panel-body{padding:clamp(26px,2.6vw,40px) clamp(30px,3.6vw,60px) 50px;display:flex;flex-direction:column;gap:clamp(24px,2.3vw,34px)}
 .panel-type{display:inline-block;align-self:flex-start;font-family:var(--fr-mono);font-size:12px;letter-spacing:.3em;
