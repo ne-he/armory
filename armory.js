@@ -27,7 +27,7 @@ const LANGS_BY_ID = {
   '07':[['Jupyter',96],['JavaScript',3],['Python',1]],
   '08':[['TypeScript',69],['JavaScript',27],['PLpgSQL',3],['CSS',1]],
   '09':[['TypeScript',70],['HTML',15],['CSS',11],['JavaScript',4]],
-  '10':[['Classified',100]],
+  '10':[['Python',86],['TypeScript',12],['Dockerfile',2]],
   '11':[['Classified',100]],
   '12':[['Classified',100]],
 };
@@ -42,8 +42,8 @@ function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
    ones receding into the hall. All share the placeholder PNG until the unique
    robot-XX.png renders exist. Unit codenames are theatrical single words (LANTERN,
-   SENTINEL…) while `name` stays the real project title. 12 units: 9 live first, then
-   3 coming_soon (Agentic AI + two Classified) pinned LAST so they read as locked. */
+   SENTINEL…) while `name` stays the real project title. 12 units: 10 live first, then
+   2 coming_soon (two Classified) pinned LAST so they read as locked. */
 const PROJECTS = [
   { id:'01', unit:'LANTERN', name:'Waste Image Classifier with Grad-CAM', type:'Deep Learning / Computer Vision', class:'Luminary', accent:'#e0a93a',
     x:'8%', y:'30%', w:'13vw', z:10, status:'live',
@@ -90,11 +90,11 @@ const PROJECTS = [
     summary:'An HCI lab final, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
     description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo with an Express 5 API, PostgreSQL + Drizzle ORM, Zod validation, and Orval generating typed API hooks from the OpenAPI spec so the frontend and backend can never drift apart.`,
     stats:{pwr:74,spd:82,def:70}, links:{live:'https://web-hci-final-clash-of-bang.vercel.app/',code:'https://github.com/ne-he/hci_lab'} },
-  { id:'10', unit:'CIPHER', name:'Agentic AI', type:'Autonomous Agents', class:'Unknown', accent:'#8a8276',
-    x:'82%', y:'33%', w:'8.5vw', z:2, status:'coming_soon',
-    summary:'An autonomous agentic system. Coming soon.', tech:[],
-    description:`An autonomous agentic system. Coming soon.`,
-    stats:{pwr:0,spd:0,def:0}, links:{} },
+  { id:'10', unit:'VANGUARD', name:'PULSE — Live Air-Quality ML', type:'MLOps / Streaming ML', class:'Herald', accent:'#37b6c9',
+    x:'82%', y:'33%', w:'8.5vw', z:2, status:'live',
+    summary:'Streaming ML that learns per-event and retrains itself after drift.', tech:['Python','river','Redis Streams','FastAPI','WebSockets','Evidently','Gemini','Docker'],
+    description:`A real-time air-quality system for Jakarta built around what happens AFTER a model deploys. It streams sensor and weather data through Redis Streams into an online model that updates on every single event (river's learn_one), forecasts PM2.5 with an uncertainty band, and flags anomaly spikes. When the data drifts it retrains itself, versions the new model, and auto-writes a fresh model card — while a Gemini agent turns each spike into a plain-language incident card. Four Dockerized services run the whole loop with one command. The backend runs complete end-to-end (smoke test, unit tests, lint all green) and the dashboard is wired over WebSocket + REST; public deploy is the next step.`,
+    stats:{pwr:84,spd:78,def:75}, links:{code:'https://github.com/ne-he/pulse'} },
   { id:'11', unit:'AEGIS', name:'Classified', type:'Coming Soon', class:'Unknown', accent:'#8a8276',
     x:'90%', y:'31%', w:'9vw', z:1, status:'coming_soon',
     summary:'Sealed until launch.', tech:[],
