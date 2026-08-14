@@ -10,7 +10,7 @@
 <!-- Display: Neue Machina (mechanical/geometric) · Body: Space Grotesk · Mono: Space Mono -->
 <link href="https://api.fontshare.com/v2/css?f[]=neue-machina@400,500,800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="armory.css?v=17" />
+<link rel="stylesheet" href="armory.css?v=18" />
 <!-- Engine is self-contained vanilla JS (manual scroll driver) — no external deps. -->
 </head>
 <body class="is-loading">
@@ -75,6 +75,16 @@
       <button class="home-btn" type="button" aria-label="Power down — return to the dark hall">
         <span class="hb-icon">⏻</span><span class="hb-label">Power Down</span>
       </button>
+
+      <!-- COMMS — contact rail. Reveals with the lit hall, same as .home-btn.
+           Without this the hall had no way to reach the person who built it. -->
+      <nav class="comms" aria-label="Contact">
+        <span class="comms-label">Comms</span>
+        <a class="comms-link" href="mailto:nehewj@gmail.com">Email</a>
+        <a class="comms-link" href="https://www.linkedin.com/in/nehemiah-wilhelmus-b90391327/" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="comms-link" href="https://github.com/ne-he" target="_blank" rel="noopener">GitHub</a>
+        <a class="comms-link comms-alt" href="https://nemiiceberg.vercel.app" target="_blank" rel="noopener">Iceberg ↗</a>
+      </nav>
 
       <!-- atmosphere -->
       <div class="layer layer-scan"></div>
