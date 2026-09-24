@@ -1,5 +1,5 @@
 /* ============================================================
-   ARMORY HALL — engine stub (data + render + interactions)
+   ARMORY HALL: engine stub (data + render + interactions)
    ============================================================ */
 
 /* Shared mech silhouette (swap .robot-body background-image with a real PNG later) */
@@ -14,7 +14,7 @@ document.documentElement.style.setProperty('--mech', MECH_SVG);
    & height, evenly spaced) standing in front of that trio. Fine-tune live with ?calibrate. */
 const ROBOT_IMG = 'generated/robot2_clear.png';
 
-/* Real language composition per unit — pulled from each GitHub repo's /languages
+/* Real language composition per unit: pulled from each GitHub repo's /languages
    API (bytes → %), top languages rounded to sum 100. web_portofolio_RAG (04) is
    private (404) so its split is an estimate; coming-soon units are placeholders. */
 const LANGS_BY_ID = {
@@ -90,10 +90,10 @@ const PROJECTS = [
     summary:'An HCI lab final, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
     description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo with an Express 5 API, PostgreSQL + Drizzle ORM, Zod validation, and Orval generating typed API hooks from the OpenAPI spec so the frontend and backend can never drift apart.`,
     stats:{pwr:74,spd:82,def:70}, links:{live:'https://web-hci-final-clash-of-bang.vercel.app/',code:'https://github.com/ne-he/hci_lab'} },
-  { id:'10', unit:'VANGUARD', name:'PULSE — Live Air-Quality ML', type:'MLOps / Streaming ML', class:'Herald', accent:'#37b6c9',
+  { id:'10', unit:'VANGUARD', name:'PULSE / Live Air-Quality ML', type:'MLOps / Streaming ML', class:'Herald', accent:'#37b6c9',
     x:'82%', y:'33%', w:'8.5vw', z:2, status:'live',
     summary:'Streaming ML that learns per-event and retrains itself after drift.', tech:['Python','river','Redis Streams','FastAPI','WebSockets','Evidently','Gemini','Docker'],
-    description:`A real-time air-quality system for Jakarta built around what happens AFTER a model deploys. It streams sensor and weather data through Redis Streams into an online model that updates on every single event (river's learn_one), forecasts PM2.5 with an uncertainty band, and flags anomaly spikes. When the data drifts it retrains itself, versions the new model, and auto-writes a fresh model card — while a Gemini agent turns each spike into a plain-language incident card. Four Dockerized services run the whole loop with one command. The backend runs complete end-to-end (smoke test, unit tests, lint all green) and the dashboard is wired over WebSocket + REST; public deploy is the next step.`,
+    description:`A real-time air-quality system for Jakarta built around what happens AFTER a model deploys. It streams sensor and weather data through Redis Streams into an online model that updates on every single event (river's learn_one), forecasts PM2.5 with an uncertainty band, and flags anomaly spikes. When the data drifts it retrains itself, versions the new model, and auto-writes a fresh model card, while a Gemini agent turns each spike into a plain-language incident card. Four Dockerized services run the whole loop with one command. The backend runs complete end-to-end (smoke test, unit tests, lint all green) and the dashboard is wired over WebSocket + REST; public deploy is the next step.`,
     stats:{pwr:84,spd:78,def:75}, links:{code:'https://github.com/ne-he/pulse'} },
   { id:'11', unit:'AEGIS', name:'VERDICT ANALYST', type:'Agentic AI / Causal Analytics', class:'Arbiter', accent:'#6c5ce7',
     x:'90%', y:'31%', w:'9vw', z:1, status:'live',
@@ -106,7 +106,7 @@ const PROJECTS = [
     description:`A mobile web app that shows how full Jakarta car parks are before you leave home, how long the gate queue is, and which nearby place still has space. Google Maps stops at the building entrance, KENNETH starts there. It covers 20 malls and BINUS campuses, books a 15-minute priority entry window, the building's own valet and EV chargers, and routes you to the least busy gate in-app, Google Maps or Waze. Built for the BINUS Venture Creation course: the team set the product decisions and the business case, I built the app. Occupancy, queues and prices come from a deterministic simulation engine, and every location says so. Personal data stays on the phone. A separate partner dashboard shows building managers the visitors they lost and where those visitors went.`,
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://kenneth-park.web.app/',code:'https://github.com/ne-he/kenneth'} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
-   to any project above — it renders in the panel preview slot automatically. */
+   to any project above: it renders in the panel preview slot automatically. */
 ].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
 
 /* ---- render robots ---- */
@@ -160,7 +160,7 @@ const panel = document.querySelector('.panel');
 function openPanel(id){
   const p = PROJECTS.find(x=>x.id===id); if(!p) return;
   const idx = PROJECTS.indexOf(p);
-  panel.style.setProperty('--glow', '#f4a93a');                        // amber — keep the panel cohesive (no per-unit blue)
+  panel.style.setProperty('--glow', '#f4a93a');                        // amber: keep the panel cohesive (no per-unit blue)
   panel.querySelector('.panel-type').textContent = p.type;
   panel.querySelector('.panel-name').textContent = p.name;
   panel.querySelector('.panel-desig').innerHTML = markName(idx);       // single name: MARK <roman>
@@ -182,12 +182,12 @@ function openPanel(id){
   }
   /* chips */
   panel.querySelector('.chips').innerHTML = p.tech.map(t=>`<span class="chip">${t}</span>`).join('');
-  /* languages — real %s from the repo's GitHub /languages */
+  /* languages: real %s from the repo's GitHub /languages */
   panel.querySelector('.stats').innerHTML = (p.langs||[]).map(l=>`
     <div class="stat"><span class="stat-k">${l.name}</span>
     <span class="stat-bar"><i style="--v:0%" data-v="${l.pct}%"></i></span>
     <span class="stat-v">${l.pct}%</span></div>`).join('');
-  /* links — always show both; disabled until a URL exists */
+  /* links: always show both; disabled until a URL exists */
   const live = p.links && p.links.live, code = p.links && p.links.code;
   const L = [
     live ? `<a class="btn-link" href="${live}" target="_blank" rel="noopener">Visit Web ↗</a>`
@@ -227,7 +227,7 @@ if(demoBox){
   demoBox.addEventListener('click', ()=>{ const u = demoBox.dataset.demo; if(u) window.open(u,'_blank','noopener'); });
 }
 
-/* title "power on" — hovering the marquee dims the whole hall and glory-glitches
+/* title "power on": hovering the marquee dims the whole hall and glory-glitches
    the title so only it stays lit */
 const hallTitleEl = document.querySelector('.hall-title');
 if(hallTitleEl){
@@ -268,7 +268,7 @@ stageEl.appendChild(rosterLabelEl);
 stageEl.appendChild(rosterTicksEl);
 stageEl.appendChild(centerHintEl);
 
-/* "Click for details" blinks above the head — only once the unit has settled in
+/* "Click for details" blinks above the head: only once the unit has settled in
    the centre (hidden while sliding) and only for live (clickable) units. */
 let hintTimer = null;
 function updateCenterHint(){
@@ -355,10 +355,10 @@ arsenal.addEventListener('touchend',e=>{
 });
 
 /* ============================================================
-   PAGE-1 REVEAL ENGINE — newgif JPG sequence (240 frames, dark→lit EMPTY hall)
+   PAGE-1 REVEAL ENGINE: newgif JPG sequence (240 frames, dark→lit EMPTY hall)
    scrubbed on <canvas> via GSAP ScrollTrigger (pin .stage, scrub:0.5). The PNG
    arsenal stays fully hidden through the whole scrub; only when it finishes does
-   a short cinematic beat (bloom flash + SYSTEM ONLINE) reveal Page 2 — idle.mp4
+   a short cinematic beat (bloom flash + SYSTEM ONLINE) reveal Page 2: idle.mp4
    loop fades in over the held last frame + 10 PNG robots fade in staggered and
    become interactive. No GSAP (offline) → manual sticky scroll driver fallback.
    ============================================================ */
@@ -372,7 +372,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const calibrating = new URLSearchParams(location.search).has('calibrate');
 
 /* idle.mp4 only covers the canvas once it truly decodes (else the lit empty-hall
-   last frame stays visible — no blank-dark cover on Safari/headless) */
+   last frame stays visible: no blank-dark cover on Safari/headless) */
 if(idleV) idleV.addEventListener('loadeddata', ()=>document.body.classList.add('idle-ok'), {once:true});
 
 const progressDots = document.querySelector('.progress');
@@ -454,7 +454,7 @@ function clearRobots(){
   });
 }
 
-/* ---------- transition flavor text (V3 "DEPLOYING UNITS" beat — cycles, not a static spinner) ---------- */
+/* ---------- transition flavor text (V3 "DEPLOYING UNITS" beat: cycles, not a static spinner) ---------- */
 const trLabel = document.querySelector('.tr-label');
 let trTimer = null;
 function cycleTransition(phrases){
@@ -467,7 +467,7 @@ function stopTransitionText(){ clearInterval(trTimer); trTimer = null; }
 
 /* ---------- shared scrub application (Page 1) ---------- */
 function applyScrub(p){
-  if(committed) return;                         // Page 2 is locked — ignore any stray scroll
+  if(committed) return;                         // Page 2 is locked: ignore any stray scroll
   currentP = p;
   drawFrameAt(p);
   const ph = p>0.62?3 : p>0.22?2 : 1;           // atmosphere phase (beam/scan/vignette CSS)
@@ -618,7 +618,7 @@ if(calibrating){
   const tag = document.createElement('div');
   tag.style.cssText='position:fixed;left:12px;bottom:12px;z-index:200;font:11px/1.5 monospace;'+
     'color:#ffc56b;background:rgba(0,0,0,.7);padding:8px 12px;border:1px solid rgba(244,169,58,.4);pointer-events:none';
-  tag.textContent='CALIBRATE — drag to move · wheel to resize · press C to copy values';
+  tag.textContent='CALIBRATE: drag to move · wheel to resize · press C to copy values';
   document.body.appendChild(tag);
 
   /* selectable output box (so values can be copied without opening devtools) */
@@ -632,7 +632,7 @@ if(calibrating){
   /* swallow clicks during calibrate (capture phase) so dragging never opens the dossier panel */
   arsenal.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); }, true);
 
-  /* window-level drag — robust: no setPointerCapture quirks, keeps tracking even if the
+  /* window-level drag: robust: no setPointerCapture quirks, keeps tracking even if the
      cursor briefly leaves the robot box mid-drag. pointerdown arms it, window move/up drive it. */
   let active=null, sx=0, sy=0, ox=0, oy=0;
   arsenal.querySelectorAll('.robot').forEach(r=>{
@@ -664,7 +664,7 @@ if(calibrating){
       const s=getComputedStyle(r);
       return `${r.dataset.id}: x:'${s.getPropertyValue('--x').trim()}', y:'${s.getPropertyValue('--y').trim()}', w:'${s.getPropertyValue('--w').trim()}'`;
     }).join('\n');
-    console.log('%c— ARMORY CALIBRATION —\n'+dump, 'color:#ffc56b');
+    console.log('%c[ ARMORY CALIBRATION ]\n'+dump, 'color:#ffc56b');
     out.value = dump; out.style.display='block'; out.focus(); out.select();   // ready to Ctrl+C
   });
 }

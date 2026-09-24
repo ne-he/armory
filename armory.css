@@ -1,5 +1,5 @@
 /* ============================================================
-   ARMORY HALL — visual skeleton
+   ARMORY HALL: visual skeleton
    Phase states driven by .stage[data-phase="1|2|3"]
    ============================================================ */
 :root{
@@ -118,7 +118,7 @@ body.is-calibrate .home-btn{display:none}
 #revealCanvas{z-index:1;width:100%;height:100%;display:block}
 #idle{z-index:2;width:100%;height:100%;object-fit:cover;display:block;background:#05070a;
   opacity:0;transition:opacity .9s var(--ease)}          /* Page-2 bg over the held last frame */
-/* only reveal the idle loop once it actually decodes — else the lit empty-hall last
+/* only reveal the idle loop once it actually decodes: else the lit empty-hall last
    frame on the canvas stays visible (no blank-dark video cover, e.g. on Safari/headless) */
 body.idle-ok .stage.is-arsenal #idle{opacity:1}
 /* once the reveal source is live, drop the gradient stand-ins */
@@ -184,9 +184,9 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
 .stage[data-phase="3"] .layer-beam{opacity:1}
 
 /* ============================================================
-   PHASE 1 — particle figure + hint
+   PHASE 1: particle figure + hint
    ============================================================ */
-/* particle figure retired — the scrub video carries the Page-1 visuals now */
+/* particle figure retired: the scrub video carries the Page-1 visuals now */
 #userParticle{display:none}
 #userParticle.legacy{
   position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
@@ -203,7 +203,7 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
   background:radial-gradient(ellipse at center, rgba(255,201,107,.45), rgba(244,169,58,.10) 46%, transparent 72%);
   filter:blur(10px);animation:breathe 4.8s var(--ease) infinite;
 }
-/* the literal gold mech silhouette is removed — Phase 1 keeps only a soft glowing
+/* the literal gold mech silhouette is removed: Phase 1 keeps only a soft glowing
    "presence" + rising sparks as a placeholder for the real Nehemiah particle-face. */
 .pf-figure{display:none}
 .pf-particles{position:absolute;inset:0;overflow:visible}
@@ -234,14 +234,14 @@ body.frames-ready .layer-bg-bright{opacity:0 !important}
 @keyframes arr{0%{top:-6px;opacity:0}40%{opacity:1}100%{top:34px;opacity:0}}
 
 /* ============================================================
-   PAGE-1 HERO HOLOGRAM — temporary standee placeholder (until the
+   PAGE-1 HERO HOLOGRAM: temporary standee placeholder (until the
    particle portrait from /hover part lands). Stands on the floor,
    dissolves out as the hall powers on.
    ============================================================ */
 #heroFigure{
   /* ---- TWEAK THESE to size / position the hologram ---- */
-  --holo-h:44vh;        /* size — smaller = reads further back */
-  --holo-bottom:20vh;   /* height off the floor — raised to clear the scroll hint */
+  --holo-h:44vh;        /* size: smaller = reads further back */
+  --holo-bottom:20vh;   /* height off the floor: raised to clear the scroll hint */
   --holo-x:0px;         /* nudge left(-) / right(+) */
   z-index:6;display:flex;align-items:flex-end;justify-content:center;
   padding-bottom:var(--holo-bottom);pointer-events:none;
@@ -256,7 +256,7 @@ body.is-locked #heroFigure{display:none}
 @media (prefers-reduced-motion: reduce){ #heroFigure{transition:none} }
 
 /* ============================================================
-   ARSENAL — robots on an arc
+   ARSENAL: robots on an arc
    ============================================================ */
 /* arsenal stays fully hidden through the scrub; only the cinematic beat reveals it */
 .arsenal{position:absolute;inset:0;z-index:5;opacity:0;pointer-events:none;transition:opacity .6s var(--ease)}
@@ -309,14 +309,14 @@ body.is-locked #heroFigure{display:none}
   opacity:.5;transition:opacity .45s var(--ease)}
 
 /* ---- real PNG robot (placeholder = generated/robot2_clear.png, transparent cut) ----
-   Already alpha-cut, so no mask needed — just drop the silhouette mask, sit it on the
+   Already alpha-cut, so no mask needed: just drop the silhouette mask, sit it on the
    floor, and add a grounding shadow + warm glow. The neon seams carry the "light source". */
 .robot.has-img .robot-figure{aspect-ratio:108/192;filter:none}   /* portrait box ≈ robot PNG */
 .robot.has-img .robot-body{
   -webkit-mask:none;mask:none;
   background-size:contain !important;background-repeat:no-repeat !important;background-position:bottom center !important;
   box-shadow:none;
-  /* NO offset drop-shadow — that made them look airborne. Just a soft warm bloom. */
+  /* NO offset drop-shadow: that made them look airborne. Just a soft warm bloom. */
   filter:drop-shadow(0 0 20px rgba(255,180,84,.14));
   transition:filter .45s var(--ease);
 }
@@ -363,7 +363,7 @@ body.is-locked #heroFigure{display:none}
 /* Idle video: blurred ambience in Page 2 */
 body.is-locked #idle { filter:blur(8px) brightness(0.45); }
 
-/* Hide the old unit-nav in roster mode — ticks + label replace it */
+/* Hide the old unit-nav in roster mode: ticks + label replace it */
 .stage.is-arsenal .unit-nav { opacity:0 !important; pointer-events:none; }
 
 /* NOTE: the old arc hover rules (.arsenal:hover .robot{filter…}) are left intact
@@ -391,7 +391,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot {
     transform .55s var(--ease);
 }
 
-/* CENTER — powered on, BIG (grows up from the floor, clears the title) */
+/* CENTER: powered on, BIG (grows up from the floor, clears the title) */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
   width:clamp(250px,42vh,560px);
   opacity:1;
@@ -401,7 +401,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"] {
   cursor:pointer;
 }
 
-/* Spotlight pool ONLY under the center unit — stops a warm "shadow/pool" from
+/* Spotlight pool ONLY under the center unit: stops a warm "shadow/pool" from
    sliding behind the others while stepping. */
 body:not(.is-calibrate) .stage.is-arsenal .robot::before { opacity:0; }
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]::before { opacity:.5; }
@@ -420,7 +420,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"].is-lock
   cursor:default;
 }
 
-/* SIDE PREVIEWS (pre/nxt) — POWERED OFF: near-black silhouettes, no glow at rest */
+/* SIDE PREVIEWS (pre/nxt): POWERED OFF: near-black silhouettes, no glow at rest */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"],
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] {
   width:clamp(150px,25vh,290px);
@@ -438,7 +438,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] { left:
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="pre"] .robot-body,
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-body { filter:none; }
 
-/* FAR (off-screen on their own side) — park left/right so nothing sweeps through
+/* FAR (off-screen on their own side): park left/right so nothing sweeps through
    the center when stepping (fixes the gray ghost). */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="far-pre"] {
   left:-12%;
@@ -481,7 +481,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
   animation:rosterDeny .44s ease;
 }
 
-/* ---- "Click for details" — blinks above the centred unit's head ---- */
+/* ---- "Click for details": blinks above the centred unit's head ---- */
 .center-hint{
   position:absolute;left:50%;top:24vh;transform:translateX(-50%);
   z-index:14;pointer-events:none;display:none;
@@ -489,13 +489,13 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="nxt"] .robot-
   text-transform:uppercase;color:var(--warm);text-shadow:0 0 14px rgba(255,180,84,.6);
   white-space:nowrap;opacity:0;padding-left:.34em;
 }
-body.is-locked .center-hint{ display:block; }              /* Page 2 only — never on the scrub page */
+body.is-locked .center-hint{ display:block; }              /* Page 2 only: never on the scrub page */
 /* lighthouse pulse: symmetric ease-in-out so fade-in == fade-out, even & smooth */
 body.is-locked .center-hint.show{ animation:hintBlink 3s ease-in-out infinite; }
 @keyframes hintBlink{ 0%{opacity:0} 50%{opacity:.95} 100%{opacity:0} }
 
 /* ============================================================
-   DOSSIER MODE — click a unit: it slides LEFT and stays lit, the
+   DOSSIER MODE: click a unit: it slides LEFT and stays lit, the
    briefing fills the RIGHT half. (toggled by body.is-dossier)
    ============================================================ */
 body.is-dossier .stage.is-arsenal .robot[data-roster-role="ctr"]{
@@ -597,7 +597,7 @@ body.is-dossier .stage.is-arsenal .robot[data-roster-role="nxt"]{
 }
 
 /* ============================================================
-   HALL TITLE — layered, themed (replaces corner logo + AI-looking HUD)
+   HALL TITLE: layered, themed (replaces corner logo + AI-looking HUD)
    ============================================================ */
 .hall-title{position:absolute;top:2.6%;left:50%;transform:translateX(-50%) translateY(-8px);
   z-index:20;text-align:center;pointer-events:none;opacity:0;cursor:default;white-space:nowrap;
@@ -609,7 +609,7 @@ body.is-dossier .stage.is-arsenal .robot[data-roster-role="nxt"]{
   text-shadow:0 0 32px rgba(244,169,58,.28);padding-left:.26em;transform-origin:50% 50%;
   transition:color .5s var(--ease),text-shadow .5s var(--ease),
              -webkit-text-stroke-color .5s var(--ease),transform .5s var(--ease)}
-/* glory-glitch ghost layers — warm/bright, not cold cyber; hidden until hover */
+/* glory-glitch ghost layers: warm/bright, not cold cyber; hidden until hover */
 .ht-main::before,.ht-main::after{
   content:attr(data-text);position:absolute;left:0;top:0;width:100%;padding-left:.26em;
   text-align:center;letter-spacing:.24em;-webkit-text-stroke:0;opacity:0;pointer-events:none}
@@ -636,7 +636,7 @@ body.title-glow .ht-sub{color:var(--warm)}
 body.title-glow .hall-dim{opacity:1}
 
 /* ============================================================
-   TRANSITION BEAT — scrub done → bloom flash + SYSTEM ONLINE → Page 2
+   TRANSITION BEAT: scrub done → bloom flash + SYSTEM ONLINE → Page 2
    ============================================================ */
 .flash{z-index:30;pointer-events:none;opacity:0;
   background:radial-gradient(62% 52% at 50% 46%, rgba(255,238,205,.96), rgba(255,170,70,.45) 42%, transparent 74%)}
@@ -715,7 +715,7 @@ body.title-glow .hall-dim{opacity:1}
   letter-spacing:.01em;line-height:1.02;margin:10px 0 8px;color:#f3ece0}
 .panel-status{font-family:var(--fr-mono);font-size:13px;letter-spacing:.2em;color:var(--amber-soft)}
 
-/* video-demo — banner by default; with a YouTube link it becomes a 16:9 poster
+/* video-demo: banner by default; with a YouTube link it becomes a 16:9 poster
    that auto-plays (muted) inline on hover. The iframe loads ONLY on hover, so it
    never adds weight to page/panel load. */
 .panel-demo{position:relative;display:flex;align-items:center;justify-content:center;min-height:56px;
@@ -815,7 +815,7 @@ body:not(.is-loading) .progress{opacity:1}
 .progress i.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 8px var(--amber)}
 
 /* ============================================================
-   RESPONSIVE — mobile: robots become horizontal scroller, labels always visible
+   RESPONSIVE: mobile: robots become horizontal scroller, labels always visible
    ============================================================ */
 @media (max-width:760px){
   .scroll-track{height:480vh}
@@ -836,7 +836,7 @@ body:not(.is-loading) .progress{opacity:1}
 }
 
 /* ============================================================
-   REDUCED MOTION — skip the scrub, jump straight to the lit arsenal
+   REDUCED MOTION: skip the scrub, jump straight to the lit arsenal
    ============================================================ */
 @media (prefers-reduced-motion: reduce){
   .scroll-track{height:100vh}
