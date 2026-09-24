@@ -22,14 +22,14 @@ const LANGS_BY_ID = {
   '02':[['Python',69],['HTML',30],['Dockerfile',1]],
   '03':[['TypeScript',68],['Python',22],['Jupyter',8],['CSS',2]],
   '04':[['TypeScript',78],['CSS',14],['JavaScript',8]],
-  '05':[['Python',93],['HTML',6],['Dockerfile',1]],
+  '05':[['TypeScript',96],['CSS',2],['PLpgSQL',2]],
   '06':[['Swift',100]],
   '07':[['Jupyter',96],['JavaScript',3],['Python',1]],
   '08':[['TypeScript',69],['JavaScript',27],['PLpgSQL',3],['CSS',1]],
   '09':[['TypeScript',70],['HTML',15],['CSS',11],['JavaScript',4]],
   '10':[['Python',86],['TypeScript',12],['Dockerfile',2]],
   '11':[['Python',66],['TypeScript',14],['HTML',10],['JavaScript',10]],
-  '12':[['Classified',100]],
+  '12':[['TypeScript',98],['CSS',1],['HTML',1]],
 };
 function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
 
@@ -42,8 +42,8 @@ function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
    ones receding into the hall. All share the placeholder PNG until the unique
    robot-XX.png renders exist. Unit codenames are theatrical single words (LANTERN,
-   SENTINEL…) while `name` stays the real project title. 12 units: 10 live first, then
-   2 coming_soon (two Classified) pinned LAST so they read as locked. */
+   SENTINEL…) while `name` stays the real project title. 12 units, all live since
+   KENNETH took the last Classified slot. A coming_soon unit still renders locked. */
 const PROJECTS = [
   { id:'01', unit:'LANTERN', name:'Waste Image Classifier with Grad-CAM', type:'Deep Learning / Computer Vision', class:'Luminary', accent:'#e0a93a',
     x:'8%', y:'30%', w:'13vw', z:10, status:'live',
@@ -65,11 +65,11 @@ const PROJECTS = [
     summary:'A conversational about-me, powered by RAG.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
     description:`An AI assistant that answers questions about me, a conversational about-me rather than a commercial bot. It runs on a retrieval-augmented (RAG) pipeline (a large language model plus embeddings and a vector database) with a live, queryable demo.`,
     stats:{pwr:92,spd:60,def:70}, links:{live:'https://web-portofolio-rag.vercel.app/',code:'https://github.com/ne-he/web_portofolio_RAG'} },
-  { id:'05', unit:'ORACLE', name:'Finance Analyst', type:'GenAI / Financial RAG', class:'Sage', accent:'#9b7be0',
+  { id:'05', unit:'ORACLE', name:'FinSight v2', type:'GenAI / Financial RAG', class:'Sage', accent:'#9b7be0',
     x:'43%', y:'32%', w:'10vw', z:9, status:'live',
-    summary:'RAG over SEC 10-K filings, cited and gated against fabrication.', tech:['Python','Gemini','FastAPI','BM25','NumPy','Supabase pgvector'],
-    description:`A production-grade RAG system that answers questions about public companies strictly from their SEC 10-K filings, with section-level citations (e.g. Item 1A Risk Factors) and a strict anti-fabrication gate that replies "not found in the filings" instead of inventing a number. It uses section-aware 10-K chunking, hybrid retrieval (dense Gemini embeddings plus BM25) fused with Reciprocal Rank Fusion, and company/year metadata filtering. On a 947-chunk corpus (NVDA, AAPL, MSFT) it measured 100% retrieval hit-rate at 6 and 100% out-of-scope gate accuracy with a golden-set eval harness.`,
-    stats:{pwr:0,spd:0,def:0}, links:{live:'',code:'https://github.com/ne-he/RAG_businessAnalysis_assist'} },
+    summary:'Answers from SEC 10-K filings only, and shows you the passage behind every claim.', tech:['Next.js','TypeScript','Gemini','Supabase pgvector','Postgres full-text','Vitest','GitHub Actions'],
+    description:`Ask what a public company said about its risks, segments or revenue drivers and get an answer built only from its SEC 10-K, cited down to the section, or an honest refusal when the filing does not support one. v2 is a full rewrite of the original Python system as one Next.js app on Vercel, with Supabase for sign-in, history and vector search. Retrieval is hybrid (vectors plus Postgres full-text, fused with Reciprocal Rank Fusion) with company and fiscal-year filters inside the ranking, and a question that names several companies gets one search per company so a comparison never comes back with only one side. The refusal gate sits at 0.66, the midpoint of the measured gap between answerable and out-of-scope questions. On 936 chunks (NVDA, AAPL, MSFT) and a 22-question golden set: hit-rate@6 18/18, out-of-scope refusals 4/4, zero false refusals. The screen is an evidence desk: every citation is a button that opens the source passage beside the answer.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://finsight-v2-nine.vercel.app/',code:'https://github.com/ne-he/finsight-v2'} },
   { id:'06', unit:'SCRIBE', name:'SimpleNotes', type:'Mobile / iOS', class:'Phantom', accent:'#8b4fd8',
     x:'50%', y:'32%', w:'9vw', z:6, status:'live',
     summary:'iOS notes with a test-driven, protocol-oriented core.', tech:['Swift','SwiftUI','XCTest','GitHub Actions','MVVM'],
@@ -100,11 +100,11 @@ const PROJECTS = [
     summary:'An analyst agent that verifies its own answers from the outside.', tech:['Python','FastAPI','Gemini','Docker sandbox','DuckDB','Next.js','Hugging Face Spaces'],
     description:`A data-analyst agent built on the assumption that an agent's answer is not correct until something outside it checks. It writes and runs its own code inside a locked Docker sandbox (no network, non-root, resource-capped), then recomputes every descriptive number a second independent way (pandas in the sandbox versus DuckDB SQL) so the confidence score is measured rather than claimed. Causal questions are never answered by the language model at all: an intent classifier routes them to a deterministic statistics engine (Welch/z-test, confidence intervals, CUPED, power/MDE, SRM) that has to pass recover-the-ground-truth tests on synthetic data, and any number in the written narrative that does not appear in the engine output gets the narrative replaced by a deterministic template.`,
     stats:{pwr:94,spd:66,def:90}, links:{live:'https://agentic-verdict-sand.vercel.app/',code:'https://github.com/ne-he/agentic_verdict'} },
-  { id:'12', unit:'VESPER', name:'Classified', type:'Coming Soon', class:'Unknown', accent:'#8a8276',
-    x:'96%', y:'30%', w:'9vw', z:1, status:'coming_soon',
-    summary:'Sealed until launch.', tech:[],
-    description:`Sealed until launch.`,
-    stats:{pwr:0,spd:0,def:0}, links:{} },
+  { id:'12', unit:'VESPER', name:'KENNETH', type:'Product / Mobile Web App', class:'Pathfinder', accent:'#10b981',
+    x:'96%', y:'30%', w:'9vw', z:1, status:'live',
+    summary:'Check how full a Jakarta car park is before you leave home.', tech:['React 19','TypeScript','Vite','Tailwind CSS','MapLibre','three.js','Firebase','PWA'],
+    description:`A mobile web app that shows how full Jakarta car parks are before you leave home, how long the gate queue is, and which nearby place still has space. Google Maps stops at the building entrance, KENNETH starts there. It covers 20 malls and BINUS campuses, books a 15-minute priority entry window, the building's own valet and EV chargers, and routes you to the least busy gate in-app, Google Maps or Waze. Built for the BINUS Venture Creation course: the team set the product decisions and the business case, I built the app. Occupancy, queues and prices come from a deterministic simulation engine, and every location says so. Personal data stays on the phone. A separate partner dashboard shows building managers the visitors they lost and where those visitors went.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://kenneth-park.web.app/',code:'https://github.com/ne-he/kenneth'} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
    to any project above — it renders in the panel preview slot automatically. */
 ].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
