@@ -15,13 +15,13 @@ document.documentElement.style.setProperty('--mech', MECH_SVG);
 const ROBOT_IMG = 'generated/robot2_clear.png';
 
 /* Real language composition per unit: pulled from each GitHub repo's /languages
-   API (bytes → %), top languages rounded to sum 100. web_portofolio_RAG (04) is
-   private (404) so its split is an estimate; coming-soon units are placeholders. */
+   API (bytes → %), top languages rounded to sum 100 (re-pulled 26 Sep 2026 for 01, 03,
+   04, 13 and 14). Coming-soon units are placeholders. */
 const LANGS_BY_ID = {
-  '01':[['Python',90],['Jupyter',10]],
+  '01':[['HTML',53],['Python',32],['JavaScript',11],['Jupyter',3],['Dockerfile',1]],
   '02':[['Python',69],['HTML',30],['Dockerfile',1]],
-  '03':[['TypeScript',68],['Python',22],['Jupyter',8],['CSS',2]],
-  '04':[['TypeScript',78],['CSS',14],['JavaScript',8]],
+  '03':[['TypeScript',68],['Python',23],['Jupyter',7],['CSS',2]],
+  '04':[['TypeScript',79],['HTML',14],['CSS',6],['PLpgSQL',1]],
   '05':[['TypeScript',96],['CSS',2],['PLpgSQL',2]],
   '06':[['Swift',100]],
   '07':[['Jupyter',96],['JavaScript',3],['Python',1]],
@@ -30,40 +30,44 @@ const LANGS_BY_ID = {
   '10':[['Python',86],['TypeScript',12],['Dockerfile',2]],
   '11':[['Python',66],['TypeScript',14],['HTML',10],['JavaScript',10]],
   '12':[['TypeScript',98],['CSS',1],['HTML',1]],
+  '13':[['TypeScript',74],['Python',15],['CSS',8],['HTML',3]],
+  '14':[['TypeScript',60],['Python',32],['Jupyter',5],['CSS',2],['JavaScript',1]],
 };
 function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
 
 /* Robot designation = "MARK <roman>" by slot order (the only name shown). */
-const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV'];
 function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
 
-/* Real portfolio data (from projects.json) on the 10 calibrated arc positions.
+/* Real portfolio data on the calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
    ones receding into the hall. All share the placeholder PNG until the unique
    robot-XX.png renders exist. Unit codenames are theatrical single words (LANTERN,
-   SENTINEL…) while `name` stays the real project title. 12 units, all live since
-   KENNETH took the last Classified slot. A coming_soon unit still renders locked. */
+   SENTINEL…) while `name` stays the real project title. 14 units, all live. 13 and 14
+   (LEDGER, CHORUS) are smaller builds, so they sit at the end of the roster on purpose.
+   A coming_soon unit still renders locked. A unit with no live URL can set
+   `links.note` to say why instead of a vague "Soon". */
 const PROJECTS = [
   { id:'01', unit:'LANTERN', name:'Waste Image Classifier with Grad-CAM', type:'Deep Learning / Computer Vision', class:'Luminary', accent:'#e0a93a',
     x:'8%', y:'30%', w:'13vw', z:10, status:'live',
-    summary:'Sorts waste images, explained with Grad-CAM.', tech:['TensorFlow/Keras','MobileNetV2','Grad-CAM','FastAPI','PyTest'],
-    description:`A deep-learning model that sorts waste images, with Grad-CAM heat-maps that make every prediction explainable instead of a black box. It refactors a Jupyter notebook into a modular, tested Python project served behind a FastAPI endpoint.`,
+    summary:'Three CNNs benchmarked on waste photos, the winner explained with Grad-CAM.', tech:['PyTorch','ResNet50','EfficientNet-B0','MobileNetV2','Grad-CAM','FastAPI','Hugging Face Spaces'],
+    description:`Three ImageNet-pretrained CNNs (ResNet50, EfficientNet-B0 and MobileNetV2) benchmarked on TrashNet, six waste classes and 2,527 images, under one identical 70/15/15 split with an imbalance-aware pipeline (weighted sampling, label smoothing) and a soft-voting ensemble on top. On the untouched test set ResNet50 won at 91.6% accuracy with a macro AUC of 0.99, ahead of the ensemble (91.0%), MobileNetV2 (84.2%) and EfficientNet-B0 (80.5%). ResNet50 serves the live NemVision demo, where Grad-CAM heat-maps show what the model looked at instead of a black-box label.`,
     stats:{pwr:84,spd:78,def:86}, links:{live:'https://deep-learning-imageclassif.vercel.app/',code:'https://github.com/ne-he/Deep_Learning_imageclassif'} },
-  { id:'02', unit:'KEYSTONE', name:'Feature Shops', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
+  { id:'02', unit:'KEYSTONE', name:'Feature Store MVP', type:'Data Engineering / MLOps', class:'Guardian', accent:'#2e6fe0',
     x:'18%', y:'31%', w:'11.5vw', z:8, status:'live',
     summary:'Production-grade feature serving for e-commerce.', tech:['Python','PostgreSQL','Redis','FastAPI','Streamlit','Evidently','Docker'],
     description:`A production-grade ML feature serving system for e-commerce, computing 23 user-level features from raw transaction data. A dual-store architecture (PostgreSQL for offline training, Redis for low-latency online serving) is exposed through a FastAPI REST API with automatic fallback and daily batch orchestration, drift detection with Evidently, and a Streamlit monitoring dashboard. Shipped with 174 tests and 95% coverage, deployed live on Hugging Face Spaces.`,
     stats:{pwr:90,spd:70,def:85}, links:{live:'https://ne-he-feature-store-mvp.hf.space/',code:'https://github.com/ne-he/Feature_shopz'} },
-  { id:'03', unit:'SENTINEL', name:'Phishing URL Detector', type:'Deep Learning / Security', class:'Warden', accent:'#36c2a8',
+  { id:'03', unit:'SENTINEL', name:'PhishGuard v2', type:'Deep Learning / Security', class:'Warden', accent:'#36c2a8',
     x:'27%', y:'32%', w:'9.5vw', z:6, status:'live',
-    summary:'Flags phishing links with a confidence score.', tech:['Python','sentence-transformers','Keras','FastAPI','React','PyTest'],
-    description:`A deep-learning backend that inspects a link and flags whether it is phishing, returning a confidence percentage alongside the model accuracy. The URL string is embedded with all-MiniLM-L6-v2, joined with 20 hand-built lexical features, and pushed through a small dense network. v2 is a deliberate rebuild of a v1 that had real defects, so it ships strict URL validation, a health endpoint that admits when the model failed to load, config from the environment, and a regression test that locks the label orientation so a retrain cannot silently swap what "phishing" means.`,
+    summary:'Flags phishing links, and tells you which layer made the call.', tech:['Python','sentence-transformers','Keras','FastAPI','React','PyTest'],
+    description:`Paste a link and get a verdict in about a second, judged from the address alone. A live phishing blocklist runs first, then a curated allowlist, and only then the model: the URL embedded with all-MiniLM-L6-v2, joined with 20 hand-built lexical features and scored by a small dense network. On a 1,000-URL holdout that never entered training it reaches 95.7% accuracy and 95.8% recall, and the known failure modes are published next to the numbers. v2 is a solo rebuild of a group coursework v1 that had real defects, so it ships strict URL validation, a health endpoint that admits when the model failed to load, 37 tests, and a regression test that locks the label orientation so a retrain cannot silently swap what "phishing" means.`,
     stats:{pwr:82,spd:80,def:88}, links:{live:'https://url-detection-one.vercel.app/',code:'https://github.com/ne-he/URL_Detection'} },
-  { id:'04', unit:'MNEMONIC', name:'Personal Resume Chatbot', type:'GenAI / RAG', class:'Mirror', accent:'#c9ced6',
+  { id:'04', unit:'MNEMONIC', name:'Ask Nemi', type:'GenAI / RAG', class:'Mirror', accent:'#c9ced6',
     x:'35%', y:'32%', w:'9vw', z:5, status:'live',
-    summary:'A conversational about-me, powered by RAG.', tech:['Next.js','Gemini API','Supabase pgvector','RAG'],
-    description:`An AI assistant that answers questions about me, a conversational about-me rather than a commercial bot. It runs on a retrieval-augmented (RAG) pipeline (a large language model plus embeddings and a vector database) with a live, queryable demo.`,
+    summary:'A resume you talk to instead of read.', tech:['Next.js','TypeScript','Gemini API','Supabase pgvector','Vercel'],
+    description:`A chatbot that answers questions about me, in Indonesian or English, from a knowledge base I curate myself. Gemini embeddings (768-dim) live in Supabase pgvector, retrieval is hybrid, and a confidence gate drops weak matches so the bot falls back honestly instead of inventing facts. Answers stream token by token, a per-visitor daily cap keeps the free tier alive, and the same backend runs the chat inside ICEBERG.`,
     stats:{pwr:92,spd:60,def:70}, links:{live:'https://web-portofolio-rag.vercel.app/',code:'https://github.com/ne-he/web_portofolio_RAG'} },
   { id:'05', unit:'ORACLE', name:'FinSight v2', type:'GenAI / Financial RAG', class:'Sage', accent:'#9b7be0',
     x:'43%', y:'32%', w:'10vw', z:9, status:'live',
@@ -74,18 +78,18 @@ const PROJECTS = [
     x:'50%', y:'32%', w:'9vw', z:6, status:'live',
     summary:'iOS notes with a test-driven, protocol-oriented core.', tech:['Swift','SwiftUI','XCTest','GitHub Actions','MVVM'],
     description:`An iOS notes app built with SwiftUI. Add, edit, search, filter, sort, pin, share, and undo-delete notes. What makes it special is the build, not the features. The core logic is fully decoupled from the UI into a pure-Swift SimpleNotesCore layer, so it is genuinely unit-tested (about 25 tests), persistence sits behind a protocol (easy to swap for iCloud or a database later), and CI runs the tests on every push. A test-driven, protocol-oriented MVVM architecture rather than a tutorial project.`,
-    stats:{pwr:0,spd:0,def:0}, links:{live:'',code:'https://github.com/ne-he/swift_UI_notes'} },
-  { id:'07', unit:'AUGUR', name:'Addiction Prediction', type:'ML Engineering / Production', class:'Prime', accent:'#ff7a1a',
+    stats:{pwr:0,spd:0,def:0}, links:{live:'',note:'iOS app, no web demo',code:'https://github.com/ne-he/swift_UI_notes'} },
+  { id:'07', unit:'AUGUR', name:'Phone Addiction Predictor v2', type:'ML Engineering / Production', class:'Prime', accent:'#ff7a1a',
     x:'58%', y:'31%', w:'8.8vw', z:5, status:'live',
-    summary:'End-to-end pipeline for phone-addiction level.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
-    description:`An end-to-end training pipeline (preprocessing, augmentation, evaluation) that predicts a person's level of phone addiction, served with a shared preprocessing core so the model behaves the same in training and in production.`,
+    summary:'Scores phone addiction from 1 to 10 after 19 short questions.', tech:['CatBoost','FastAPI','Streamlit','SHAP','Docker','GitHub Actions','HuggingFace'],
+    description:`A CatBoost regressor that scores smartphone addiction from 1 to 10 after 19 short questions, then names the factors pushing the score up. One shared Preprocessor class is the single source of truth for training, the FastAPI service and the demo, so training and serving cannot drift apart. Ships with SHAP explanations, tests, CI and Docker, and the model card flags its 0.95 R² as an artifact of synthetic data rather than clinical validity.`,
     stats:{pwr:88,spd:75,def:92}, links:{live:'https://addictv2.vercel.app/',code:'https://github.com/ne-he/Addictv2'} },
-  { id:'08', unit:'CADENCE', name:"Family's Web", type:'Full-stack Web App', class:'Forge', accent:'#e8742c',
+  { id:'08', unit:'CADENCE', name:'Family Task Board', type:'Full-stack Web App', class:'Forge', accent:'#e8742c',
     x:'66%', y:'31%', w:'9vw', z:4, status:'live',
-    summary:'A family web app, all in one dashboard.', tech:['TypeScript','JavaScript','PostgreSQL'],
-    description:`A family web app that brings tasks, reminders, and shared information together in one clean dashboard.`,
+    summary:'A shared task board built for my own household.', tech:['Next.js','TypeScript','Supabase','Supabase Realtime','PostgreSQL'],
+    description:`A shared to-do app for one family, built for my own household rather than for a grade. Every member gets a private board, plus a common board where tasks are dragged onto whoever takes them, with threaded comments and live updates through Supabase Realtime. It is deployed and in daily use.`,
     stats:{pwr:50,spd:95,def:55}, links:{live:'https://partai-wilhelmus.vercel.app/',code:'https://github.com/ne-he/Partai_Wilhelmus'} },
-  { id:'09', unit:'HAVOC', name:'Clash of Bangs', type:'Interactive Web / HCI Lab', class:'Striker', accent:'#e0312e',
+  { id:'09', unit:'HAVOC', name:'Clash of BaNG', type:'Interactive Web / HCI Lab', class:'Striker', accent:'#e0312e',
     x:'74%', y:'34%', w:'8vw', z:3, status:'live',
     summary:'An HCI lab final, built to bang.', tech:['TypeScript','Express 5','PostgreSQL','Drizzle','Zod','OpenAPI'],
     description:`Final project for a Human-Computer Interaction lab, built as a TypeScript monorepo with an Express 5 API, PostgreSQL + Drizzle ORM, Zod validation, and Orval generating typed API hooks from the OpenAPI spec so the frontend and backend can never drift apart.`,
@@ -93,8 +97,8 @@ const PROJECTS = [
   { id:'10', unit:'VANGUARD', name:'PULSE / Live Air-Quality ML', type:'MLOps / Streaming ML', class:'Herald', accent:'#37b6c9',
     x:'82%', y:'33%', w:'8.5vw', z:2, status:'live',
     summary:'Streaming ML that learns per-event and retrains itself after drift.', tech:['Python','river','Redis Streams','FastAPI','WebSockets','Evidently','Gemini','Docker'],
-    description:`A real-time air-quality system for Jakarta built around what happens AFTER a model deploys. It streams sensor and weather data through Redis Streams into an online model that updates on every single event (river's learn_one), forecasts PM2.5 with an uncertainty band, and flags anomaly spikes. When the data drifts it retrains itself, versions the new model, and auto-writes a fresh model card, while a Gemini agent turns each spike into a plain-language incident card. Four Dockerized services run the whole loop with one command. The backend runs complete end-to-end (smoke test, unit tests, lint all green) and the dashboard is wired over WebSocket + REST; public deploy is the next step.`,
-    stats:{pwr:84,spd:78,def:75}, links:{code:'https://github.com/ne-he/pulse'} },
+    description:`A real-time air-quality system for Jakarta built around what happens AFTER a model deploys. It streams sensor and weather data through Redis Streams into an online model that updates on every single event (river's learn_one), forecasts PM2.5 with an uncertainty band, and flags anomaly spikes. When the data drifts it retrains itself, versions the new model, and auto-writes a fresh model card, while a Gemini agent turns each spike into a plain-language incident card. The full stack is four Dockerized services, and a one-command local demo runs the whole loop in a single process with no Redis server, no Docker and no API keys. There is no public deploy, on purpose: it is built to be run, not hosted.`,
+    stats:{pwr:84,spd:78,def:75}, links:{live:'',note:'Local demo, by design',code:'https://github.com/ne-he/pulse'} },
   { id:'11', unit:'AEGIS', name:'VERDICT ANALYST', type:'Agentic AI / Causal Analytics', class:'Arbiter', accent:'#6c5ce7',
     x:'90%', y:'31%', w:'9vw', z:1, status:'live',
     summary:'An analyst agent that verifies its own answers from the outside.', tech:['Python','FastAPI','Gemini','Docker sandbox','DuckDB','Next.js','Hugging Face Spaces'],
@@ -105,6 +109,16 @@ const PROJECTS = [
     summary:'Check how full a Jakarta car park is before you leave home.', tech:['React 19','TypeScript','Vite','Tailwind CSS','MapLibre','three.js','Firebase','PWA'],
     description:`A mobile web app that shows how full Jakarta car parks are before you leave home, how long the gate queue is, and which nearby place still has space. Google Maps stops at the building entrance, KENNETH starts there. It covers 20 malls and BINUS campuses, books a 15-minute priority entry window, the building's own valet and EV chargers, and routes you to the least busy gate in-app, Google Maps or Waze. Built for the BINUS Venture Creation course: the team set the product decisions and the business case, I built the app. Occupancy, queues and prices come from a deterministic simulation engine, and every location says so. Personal data stays on the phone. A separate partner dashboard shows building managers the visitors they lost and where those visitors went.`,
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://kenneth-park.web.app/',code:'https://github.com/ne-he/kenneth'} },
+  { id:'13', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI', class:'Scout', accent:'#3fb27f',
+    x:'98%', y:'30%', w:'9vw', z:1, status:'live',
+    summary:'20,848 orders read for three decisions an owner actually has to make.', tech:['Python','pandas','TypeScript','React','Recharts','Vite'],
+    description:`20,848 marketplace orders read for three decisions an owner actually has to make: which products deserve budget, which regions are failing, and where margin leaks. The highest-volume product turns out not to be the revenue driver, cancellation tracks geography rather than the COD payment method it usually gets blamed on, and shipping subsidy compounds the loss in the same provinces that cancel most. The harder half was the data: eleven order-status variants normalised so valid orders were not discarded, two missing months marked as gaps instead of zeroes, and multi-category orders split proportionally so revenue is never double counted.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://dashboard-nehemiah.vercel.app/',code:'https://github.com/ne-he/nemi-dashboard'} },
+  { id:'14', unit:'CHORUS', name:'Suara Rakyat', type:'NLP / Sentiment Analysis', class:'Envoy', accent:'#ce1126',
+    x:'99%', y:'30%', w:'9vw', z:1, status:'live',
+    summary:'Reads the tone of citizen reviews of Indonesian public-service apps.', tech:['Python','scikit-learn','pandas','IndoBERTweet','Next.js','TypeScript'],
+    description:`A Software Engineering course team project that reads the tone of 617,722 citizen reviews of six Indonesian public-service apps, from the IGAR dataset. Three classical models score every review you type, with a Linear SVM as the default at a test macro-F1 of 0.668, and a fine-tuned IndoBERTweet is reported beside them as the comparison at 0.692. The dataset hides a trap: 38% of its rows are exact duplicates, so the split is made per unique text to keep test reviews out of training. The web shows the evidence for each model and can check up to 1,000 reviews at once.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://suara-rakyat-xi.vercel.app/',code:'https://github.com/ne-he/suara-rakyat'} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
    to any project above: it renders in the panel preview slot automatically. */
 ].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
@@ -191,7 +205,7 @@ function openPanel(id){
   const live = p.links && p.links.live, code = p.links && p.links.code;
   const L = [
     live ? `<a class="btn-link" href="${live}" target="_blank" rel="noopener">Visit Web ↗</a>`
-         : `<span class="btn-link is-disabled">Visit Web (Soon)</span>`,
+         : `<span class="btn-link is-disabled">${(p.links && p.links.note) || 'Visit Web (Soon)'}</span>`,
     code ? `<a class="btn-link ghost" href="${code}" target="_blank" rel="noopener">Source ↗</a>`
          : `<span class="btn-link ghost is-disabled">Source (Soon)</span>`,
   ];

@@ -845,3 +845,6 @@ body:not(.is-loading) .progress{opacity:1}
   .layer-grain,.uh-arrow{animation:none}
   .robot{transition:none}
 }
+
+/* visually hidden, still read by screen readers and crawlers */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

@@ -1,0 +1,6 @@
+# Working files that live in the repo but must not be served by the site
+README.md
+.thumbnail
+reference/
+md/
+uploads/
