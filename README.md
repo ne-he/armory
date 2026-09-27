@@ -19,7 +19,7 @@ Every unit is one object in the `PROJECTS` array at the top of `armory.js`. Addi
 means adding one object there, not touching markup:
 
 ```js
-{ id:'13', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI',
+{ id:'14', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI',
   class:'Scout', accent:'#3fb27f', status:'live',
   summary:'one line pitch', description:`the full paragraph`,
   tech:['Python','pandas','React'],
@@ -32,6 +32,9 @@ means adding one object there, not touching markup:
 - The language bars in each dossier are real: `LANGS_BY_ID` holds the split from each repo's
   GitHub `/languages` endpoint, rounded to sum 100.
 - The roster order is deliberate. The flagship work comes first and smaller builds sit at the end.
+- Every unit has its own robot, `generated/units/robot-<id>.webp`: the same body, pose and
+  framing, with the glow re-hued to the unit's accent. `python tools/robot_units.py` rebuilds
+  them, so a new unit only needs one more `(id, accent)` line there.
 
 ## Stack
 

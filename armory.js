@@ -8,15 +8,17 @@ const MECH_SVG =
 document.documentElement.style.setProperty('--mech', MECH_SVG);
 
 /* ---- PROJECTS ----
-   Placeholder art: every unit uses the transparent-cut robot (swap per-unit later).
+   Art: one robot per unit in generated/units/robot-<id>.webp. All 15 are the same body,
+   pose and framing as generated/robot2_clear.png, only the glow is re-hued to the unit's
+   accent, so the hall layout never shifts when a unit is added.
    x = left%, y = bottom%, w = width(vw), z = depth. frames_2 ends on an EMPTY hall + 3
    hero robots dead-centre, so the 10 units line up as a STRAIGHT front rank (uniform size
    & height, evenly spaced) standing in front of that trio. Fine-tune live with ?calibrate. */
-const ROBOT_IMG = 'generated/robot2_clear.png';
+const robotImg = id => `generated/units/robot-${id}.webp`;
 
 /* Real language composition per unit: pulled from each GitHub repo's /languages
    API (bytes → %), top languages rounded to sum 100 (re-pulled 26 Sep 2026 for 01, 03,
-   04, 13 and 14). Coming-soon units are placeholders. */
+   04, 14 and 15, and 28 Sep 2026 for 13). Coming-soon units are placeholders. */
 const LANGS_BY_ID = {
   '01':[['HTML',53],['Python',32],['JavaScript',11],['Jupyter',3],['Dockerfile',1]],
   '02':[['Python',69],['HTML',30],['Dockerfile',1]],
@@ -30,22 +32,23 @@ const LANGS_BY_ID = {
   '10':[['Python',86],['TypeScript',12],['Dockerfile',2]],
   '11':[['Python',66],['TypeScript',14],['HTML',10],['JavaScript',10]],
   '12':[['TypeScript',98],['CSS',1],['HTML',1]],
-  '13':[['TypeScript',74],['Python',15],['CSS',8],['HTML',3]],
-  '14':[['TypeScript',60],['Python',32],['Jupyter',5],['CSS',2],['JavaScript',1]],
+  '13':[['JavaScript',80],['CSS',16],['HTML',4]],
+  '14':[['TypeScript',74],['Python',15],['CSS',8],['HTML',3]],
+  '15':[['TypeScript',60],['Python',32],['Jupyter',5],['CSS',2],['JavaScript',1]],
 };
 function makeLangs(id){ return (LANGS_BY_ID[id]||[]).map(([name,pct])=>({name,pct})); }
 
 /* Robot designation = "MARK <roman>" by slot order (the only name shown). */
-const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV'];
+const ROMAN = ['','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
 function markName(idx){ return 'MARK ' + (ROMAN[idx+1] || String(idx+1)); }
 
 /* Real portfolio data on the calibrated arc positions.
    Schema: unit (codename) · class (designation) · accent · stats {pwr,spd,def}.
    z rises with how far FORWARD a unit sits so bigger front units overlap the smaller
-   ones receding into the hall. All share the placeholder PNG until the unique
-   robot-XX.png renders exist. Unit codenames are theatrical single words (LANTERN,
-   SENTINEL…) while `name` stays the real project title. 14 units, all live. 13 and 14
-   (LEDGER, CHORUS) are smaller builds, so they sit at the end of the roster on purpose.
+   ones receding into the hall. Each unit has its own robot render (see robotImg).
+   Unit codenames are theatrical single words (LANTERN, SENTINEL…) while `name` stays
+   the real project title. 15 units, all live. 14 and 15 (LEDGER, CHORUS) are smaller
+   builds, so they sit at the end of the roster on purpose.
    A coming_soon unit still renders locked. A unit with no live URL can set
    `links.note` to say why instead of a vague "Soon". */
 const PROJECTS = [
@@ -107,21 +110,26 @@ const PROJECTS = [
   { id:'12', unit:'VESPER', name:'KENNETH', type:'Product / Mobile Web App', class:'Pathfinder', accent:'#10b981',
     x:'96%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'Check how full a Jakarta car park is before you leave home.', tech:['React 19','TypeScript','Vite','Tailwind CSS','MapLibre','three.js','Firebase','PWA'],
-    description:`A mobile web app that shows how full Jakarta car parks are before you leave home, how long the gate queue is, and which nearby place still has space. Google Maps stops at the building entrance, KENNETH starts there. It covers 20 malls and BINUS campuses, books a 15-minute priority entry window, the building's own valet and EV chargers, and routes you to the least busy gate in-app, Google Maps or Waze. Built for the BINUS Venture Creation course: the team set the product decisions and the business case, I built the app. Occupancy, queues and prices come from a deterministic simulation engine, and every location says so. Personal data stays on the phone. A separate partner dashboard shows building managers the visitors they lost and where those visitors went.`,
+    description:`A mobile web app that shows how full Jakarta car parks are before you leave home, how long the gate queue is, and which nearby place still has space. Google Maps stops at the building entrance, KENNETH starts there. It covers 20 malls and BINUS campuses, books a bay in the KENNETH Zone (reserved bays by the lobby), a KENNETH runner valet and EV chargers, and routes you to the least busy gate in-app, Google Maps or Waze. Built for the BINUS Venture Creation course: the team set the product decisions and the business case, I built the app. Occupancy, queues and prices come from a deterministic simulation engine, and every location says so. Personal data stays on the phone. A separate partner dashboard shows building managers the visitors they lost and where those visitors went.`,
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://kenneth-park.web.app/',code:'https://github.com/ne-he/kenneth'} },
-  { id:'13', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI', class:'Scout', accent:'#3fb27f',
+  { id:'13', unit:'GLACIER', name:'ICEBERG', type:'Web 3D / Interactive CV', class:'Diver', accent:'#8fd8ff',
+    x:'97%', y:'30%', w:'9vw', z:1, status:'live',
+    summary:'A web CV you scroll down into, through a live-rendered glacier.', tech:['React','React Three Fiber','three.js','drei','GSAP','Blender','Vite'],
+    description:`A web CV you scroll down into instead of reading. The whole site is one continuous camera descent through a foggy, monochrome glacier rendered live in React Three Fiber: ice crystals bend what is behind them with real refraction (drei's MeshTransmissionMaterial, not a faked transparent shader) and open a project on click, a face assembles out of drifting particles, and a portal carries you into the next act. The scene is real 3D but the text is not: copy and interface sit on top as plain HTML, so they stay selectable, accessible and cheap to change. The ice was modelled in Blender and exported to GLB with meshopt compression: the heaviest rock went from 10.7 MB to 0.4 MB, and it loads off the blocking path so the scene never waits for it. A chat dock asks the Ask Nemi backend through a same-origin rewrite, so the browser never deals with CORS.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://nemiiceberg.vercel.app/',code:'https://github.com/ne-he/iceberg'} },
+  { id:'14', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI', class:'Scout', accent:'#3fb27f',
     x:'98%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'20,848 orders read for three decisions an owner actually has to make.', tech:['Python','pandas','TypeScript','React','Recharts','Vite'],
     description:`20,848 marketplace orders read for three decisions an owner actually has to make: which products deserve budget, which regions are failing, and where margin leaks. The highest-volume product turns out not to be the revenue driver, cancellation tracks geography rather than the COD payment method it usually gets blamed on, and shipping subsidy compounds the loss in the same provinces that cancel most. The harder half was the data: eleven order-status variants normalised so valid orders were not discarded, two missing months marked as gaps instead of zeroes, and multi-category orders split proportionally so revenue is never double counted.`,
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://dashboard-nehemiah.vercel.app/',code:'https://github.com/ne-he/nemi-dashboard'} },
-  { id:'14', unit:'CHORUS', name:'Suara Rakyat', type:'NLP / Sentiment Analysis', class:'Envoy', accent:'#ce1126',
+  { id:'15', unit:'CHORUS', name:'Suara Rakyat', type:'NLP / Sentiment Analysis', class:'Envoy', accent:'#ce1126',
     x:'99%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'Reads the tone of citizen reviews of Indonesian public-service apps.', tech:['Python','scikit-learn','pandas','IndoBERTweet','Next.js','TypeScript'],
     description:`A Software Engineering course team project that reads the tone of 617,722 citizen reviews of six Indonesian public-service apps, from the IGAR dataset. Three classical models score every review you type, with a Linear SVM as the default at a test macro-F1 of 0.668, and a fine-tuned IndoBERTweet is reported beside them as the comparison at 0.692. The dataset hides a trap: 38% of its rows are exact duplicates, so the split is made per unique text to keep test reviews out of training. The web shows the evidence for each model and can check up to 1,000 reviews at once.`,
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://suara-rakyat-xi.vercel.app/',code:'https://github.com/ne-he/suara-rakyat'} },
 /* To show a project-page screenshot in the dossier, add `preview:'path/to/shot.png'`
    to any project above: it renders in the panel preview slot automatically. */
-].map(p => ({ ...p, image: ROBOT_IMG, langs: makeLangs(p.id) }));
+].map(p => ({ ...p, image: robotImg(p.id), langs: makeLangs(p.id) }));
 
 /* ---- render robots ---- */
 const arsenal = document.querySelector('.arsenal');
@@ -132,7 +140,7 @@ PROJECTS.forEach(p=>{
   const r = document.createElement('div');
   r.className = 'robot' + (locked ? ' is-locked' : '') + (p.image ? ' has-img' : '');
   r.dataset.id = p.id;
-  r.style.cssText = `--x:${p.x};--y:${p.y};--w:${p.w};--z:${p.z}`;
+  r.style.cssText = `--x:${p.x};--y:${p.y};--w:${p.w};--z:${p.z};--glow:${p.accent}`;
   r.innerHTML = `
     <div class="robot-figure">
       <div class="robot-body" ${p.image?`style="background-image:url('${p.image}');background-size:contain;background-repeat:no-repeat;background-position:center"`:''}></div>

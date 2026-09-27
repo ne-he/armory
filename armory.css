@@ -308,7 +308,7 @@ body.is-locked #heroFigure{display:none}
   background:radial-gradient(ellipse at center, rgba(255,201,107,.16), transparent 68%);
   opacity:.5;transition:opacity .45s var(--ease)}
 
-/* ---- real PNG robot (placeholder = generated/robot2_clear.png, transparent cut) ----
+/* ---- real robot render (generated/units/robot-<id>.webp, transparent cut) ----
    Already alpha-cut, so no mask needed: just drop the silhouette mask, sit it on the
    floor, and add a grounding shadow + warm glow. The neon seams carry the "light source". */
 .robot.has-img .robot-figure{aspect-ratio:108/192;filter:none}   /* portrait box ≈ robot PNG */
@@ -316,8 +316,8 @@ body.is-locked #heroFigure{display:none}
   -webkit-mask:none;mask:none;
   background-size:contain !important;background-repeat:no-repeat !important;background-position:bottom center !important;
   box-shadow:none;
-  /* NO offset drop-shadow: that made them look airborne. Just a soft warm bloom. */
-  filter:drop-shadow(0 0 20px rgba(255,180,84,.14));
+  /* NO offset drop-shadow: that made them look airborne. Just a soft bloom in the unit's own glow colour. */
+  filter:drop-shadow(0 0 20px color-mix(in srgb, var(--glow) 14%, transparent));
   transition:filter .45s var(--ease);
 }
 .robot.has-img .robot-body::after{display:none}
@@ -408,7 +408,7 @@ body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]::before
 
 /* Center hover: warm glow intensifies */
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]:not(.is-locked):hover .robot-body {
-  filter:drop-shadow(0 0 44px var(--amber)) brightness(1.13);
+  filter:drop-shadow(0 0 44px var(--glow)) brightness(1.13);
 }
 body:not(.is-calibrate) .stage.is-arsenal .robot[data-roster-role="ctr"]:not(.is-locked):hover::before {
   opacity:1;
