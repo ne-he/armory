@@ -116,7 +116,7 @@ const PROJECTS = [
     x:'97%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'A web CV you scroll down into, through a live-rendered glacier.', tech:['React','React Three Fiber','three.js','drei','GSAP','Blender','Vite'],
     description:`A web CV you scroll down into instead of reading. The whole site is one continuous camera descent through a foggy, monochrome glacier rendered live in React Three Fiber: ice crystals bend what is behind them with real refraction (drei's MeshTransmissionMaterial, not a faked transparent shader) and open a project on click, a face assembles out of drifting particles, and a portal carries you into the next act. The scene is real 3D but the text is not: copy and interface sit on top as plain HTML, so they stay selectable, accessible and cheap to change. The ice was modelled in Blender and exported to GLB with meshopt compression: the heaviest rock went from 10.7 MB to 0.4 MB, and it loads off the blocking path so the scene never waits for it. A chat dock asks the Ask Nemi backend through a same-origin rewrite, so the browser never deals with CORS.`,
-    stats:{pwr:0,spd:0,def:0}, links:{live:'https://nemiiceberg.vercel.app/',code:'https://github.com/ne-he/iceberg'} },
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://ice-nemi.vercel.app/',code:'https://github.com/ne-he/iceberg'} },
   { id:'14', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI', class:'Scout', accent:'#3fb27f',
     x:'98%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'20,848 orders read for three decisions an owner actually has to make.', tech:['Python','pandas','TypeScript','React','Recharts','Vite'],
