@@ -18,7 +18,7 @@ const robotImg = id => `generated/units/robot-${id}.webp`;
 
 /* Real language composition per unit: pulled from each GitHub repo's /languages
    API (bytes → %), top languages rounded to sum 100 (re-pulled 26 Sep 2026 for 01, 03,
-   04, 14 and 15, and 28 Sep 2026 for 13). Coming-soon units are placeholders. */
+   04, 14 and 15, and 4 Oct 2026 for 13, ICEBERG v2 in ne-he/icee). Coming-soon units are placeholders. */
 const LANGS_BY_ID = {
   '01':[['HTML',53],['Python',32],['JavaScript',11],['Jupyter',3],['Dockerfile',1]],
   '02':[['Python',69],['HTML',30],['Dockerfile',1]],
@@ -32,7 +32,7 @@ const LANGS_BY_ID = {
   '10':[['Python',86],['TypeScript',12],['Dockerfile',2]],
   '11':[['Python',66],['TypeScript',14],['HTML',10],['JavaScript',10]],
   '12':[['TypeScript',98],['CSS',1],['HTML',1]],
-  '13':[['JavaScript',80],['CSS',16],['HTML',4]],
+  '13':[['JavaScript',78],['CSS',11],['Python',8],['HTML',3]],
   '14':[['TypeScript',74],['Python',15],['CSS',8],['HTML',3]],
   '15':[['TypeScript',60],['Python',32],['Jupyter',5],['CSS',2],['JavaScript',1]],
 };
@@ -114,9 +114,9 @@ const PROJECTS = [
     stats:{pwr:0,spd:0,def:0}, links:{live:'https://kenneth-park.web.app/',code:'https://github.com/ne-he/kenneth'} },
   { id:'13', unit:'GLACIER', name:'ICEBERG', type:'Web 3D / Interactive CV', class:'Diver', accent:'#8fd8ff',
     x:'97%', y:'30%', w:'9vw', z:1, status:'live',
-    summary:'A web CV you scroll down into, through a live-rendered glacier.', tech:['React','React Three Fiber','three.js','drei','GSAP','Blender','Vite'],
-    description:`A web CV you scroll down into instead of reading. The whole site is one continuous camera descent through a foggy, monochrome glacier rendered live in React Three Fiber: ice crystals bend what is behind them with real refraction (drei's MeshTransmissionMaterial, not a faked transparent shader) and open a project on click, a face assembles out of drifting particles, and a portal carries you into the next act. The scene is real 3D but the text is not: copy and interface sit on top as plain HTML, so they stay selectable, accessible and cheap to change. The ice was modelled in Blender and exported to GLB with meshopt compression: the heaviest rock went from 10.7 MB to 0.4 MB, and it loads off the blocking path so the scene never waits for it. A chat dock asks the Ask Nemi backend through a same-origin rewrite, so the browser never deals with CORS.`,
-    stats:{pwr:0,spd:0,def:0}, links:{live:'https://ice-nemi.vercel.app/',code:'https://github.com/ne-he/iceberg'} },
+    summary:'A web CV you scroll down into, from a snowfield into a live-rendered ice cave.', tech:['React','React Three Fiber','three.js','drei','GSAP','Vite','Python'],
+    description:`A web CV you scroll down into instead of reading. The site opens on an overcast snowfield with a mountain horizon, and scrolling drops the camera through a crack in the snow into a blue ice cave, where each part of my background is an ice block you can open. Everything visual is real-time WebGL in React Three Fiber, while the copy sits on top as plain HTML, so it stays selectable, accessible and cheap to change. The world ships with no big asset files: the snowfield, the crevasse, the cave walls and the mountain ring are generated from noise in JavaScript when the page loads, the snow and ice detail textures come from Python scripts and stay under 200 KB together, and every ice block shares one reduced-resolution refraction buffer instead of rendering the scene again. A chat dock asks the Ask Nemi backend through a same-origin rewrite, so the browser never deals with CORS.`,
+    stats:{pwr:0,spd:0,def:0}, links:{live:'https://ice-nemi.vercel.app/',code:'https://github.com/ne-he/icee'} },
   { id:'14', unit:'LEDGER', name:'E-Commerce Sales Analysis', type:'Data Analysis / BI', class:'Scout', accent:'#3fb27f',
     x:'98%', y:'30%', w:'9vw', z:1, status:'live',
     summary:'20,848 orders read for three decisions an owner actually has to make.', tech:['Python','pandas','TypeScript','React','Recharts','Vite'],
